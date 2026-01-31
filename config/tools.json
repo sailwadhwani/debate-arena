@@ -1,0 +1,38 @@
+{
+  "tools": [
+    {
+      "name": "web_search",
+      "description": "Search the web for current information on a topic",
+      "enabled": true,
+      "requiresApiKey": "TAVILY_API_KEY"
+    },
+    {
+      "name": "calculator",
+      "description": "Perform mathematical calculations",
+      "enabled": true
+    },
+    {
+      "name": "query_document",
+      "description": "Search and query the loaded document for specific information",
+      "enabled": true
+    }
+  ],
+  "moderatorTools": [
+    {
+      "name": "evaluate_consensus",
+      "description": "Evaluate the level of agreement across all agent positions"
+    },
+    {
+      "name": "identify_conflicts",
+      "description": "Identify key points of disagreement between agents"
+    },
+    {
+      "name": "assess_progress",
+      "description": "Determine if new substantive points are being made"
+    },
+    {
+      "name": "generate_summary",
+      "description": "Generate a final synthesis of all perspectives"
+    }
+  ]
+}
