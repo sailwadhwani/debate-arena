@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  // Set correct turbopack root to avoid workspace inference issues
+  turbopack: {
+    root: process.cwd(),
+  },
 };
 
 export default nextConfig;
