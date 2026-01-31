@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
     },
+    // Optimize package imports for better tree-shaking and profiling
+    optimizePackageImports: ["lucide-react"],
   },
   // Set correct turbopack root to avoid workspace inference issues
   turbopack: {

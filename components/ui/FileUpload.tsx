@@ -1,24 +1,35 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { Upload, FileText, X } from "lucide-react";
+import { Upload, FileText, X, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+export interface UploadedFile {
+  file: File;
+  id: string;
+  name: string;
+  size: number;
+}
 
 interface FileUploadProps {
   onUpload: (file: File) => Promise<void>;
+  onFilesChange?: (files: UploadedFile[]) => void;
   accept?: string;
   maxSize?: number;
+  multiple?: boolean;
   className?: string;
 }
 
 export function FileUpload({
   onUpload,
+  onFilesChange,
   accept = ".pdf",
   maxSize = 10 * 1024 * 1024, // 10MB
+  multiple = false,
   className,
 }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<UploadedFile[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -38,18 +49,51 @@ export function FileUpload({
         return;
       }
 
-      setFile(selectedFile);
+      const newFile: UploadedFile = {
+        file: selectedFile,
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        name: selectedFile.name,
+        size: selectedFile.size,
+      };
+
+      if (multiple) {
+        const updatedFiles = [...files, newFile];
+        setFiles(updatedFiles);
+        onFilesChange?.(updatedFiles);
+      } else {
+        setFiles([newFile]);
+        onFilesChange?.([newFile]);
+      }
+
       setLoading(true);
 
       try {
         await onUpload(selectedFile);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to upload file");
+        // Remove the file on error
+        if (multiple) {
+          const updatedFiles = files.filter(f => f.id !== newFile.id);
+          setFiles(updatedFiles);
+          onFilesChange?.(updatedFiles);
+        } else {
+          setFiles([]);
+          onFilesChange?.([]);
+        }
       } finally {
         setLoading(false);
       }
     },
-    [onUpload, maxSize]
+    [onUpload, maxSize, multiple, files, onFilesChange]
+  );
+
+  const handleMultipleFiles = useCallback(
+    async (fileList: FileList) => {
+      for (const file of Array.from(fileList)) {
+        await handleFile(file);
+      }
+    },
+    [handleFile]
   );
 
   const handleDrop = useCallback(
@@ -57,48 +101,112 @@ export function FileUpload({
       e.preventDefault();
       setIsDragging(false);
 
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile) {
-        handleFile(droppedFile);
+      if (multiple) {
+        handleMultipleFiles(e.dataTransfer.files);
+      } else {
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile) {
+          handleFile(droppedFile);
+        }
       }
     },
-    [handleFile]
+    [handleFile, handleMultipleFiles, multiple]
   );
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const selectedFile = e.target.files?.[0];
-      if (selectedFile) {
-        handleFile(selectedFile);
+      if (!e.target.files) return;
+
+      if (multiple) {
+        handleMultipleFiles(e.target.files);
+      } else {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+          handleFile(selectedFile);
+        }
       }
+      // Reset input value to allow selecting the same file again
+      e.target.value = "";
     },
-    [handleFile]
+    [handleFile, handleMultipleFiles, multiple]
   );
 
-  const clearFile = useCallback(() => {
-    setFile(null);
+  const removeFile = useCallback((id: string) => {
+    const updatedFiles = files.filter(f => f.id !== id);
+    setFiles(updatedFiles);
+    onFilesChange?.(updatedFiles);
     setError(null);
-  }, []);
+  }, [files, onFilesChange]);
+
+  const clearAllFiles = useCallback(() => {
+    setFiles([]);
+    onFilesChange?.([]);
+    setError(null);
+  }, [onFilesChange]);
+
+  const hasFiles = files.length > 0;
 
   return (
     <div className={cn("relative", className)}>
-      {file ? (
-        <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <FileText className="w-8 h-8 text-indigo-600" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-              {file.name}
-            </p>
-            <p className="text-xs text-gray-500">
-              {(file.size / 1024).toFixed(1)} KB
-            </p>
+      {hasFiles ? (
+        <div className="min-h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 p-3">
+          {/* File list */}
+          <div className="space-y-2 mb-3">
+            {files.map((f) => (
+              <div
+                key={f.id}
+                className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+              >
+                <FileText className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {f.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {(f.size / 1024).toFixed(1)} KB
+                  </p>
+                </div>
+                <button
+                  onClick={() => removeFile(f.id)}
+                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Remove file"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
           </div>
-          <button
-            onClick={clearFile}
-            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+
+          {/* Add more files (if multiple) or replace file */}
+          <label
+            className={cn(
+              "flex items-center justify-center gap-2 p-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+              "border-gray-300 hover:border-indigo-500 dark:border-gray-600 dark:hover:border-indigo-500",
+              "text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+            )}
           >
-            <X className="w-5 h-5" />
-          </button>
+            <input
+              type="file"
+              accept={accept}
+              multiple={multiple}
+              onChange={handleChange}
+              className="hidden"
+            />
+            <Plus className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              {multiple ? "Add more files" : "Replace file"}
+            </span>
+          </label>
+
+          {/* Clear all button (if multiple files) */}
+          {multiple && files.length > 1 && (
+            <button
+              onClick={clearAllFiles}
+              className="mt-2 text-xs text-gray-500 hover:text-red-500 transition-colors"
+            >
+              Clear all files
+            </button>
+          )}
         </div>
       ) : (
         <label
@@ -109,15 +217,16 @@ export function FileUpload({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           className={cn(
-            "flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+            "flex flex-col items-center justify-center h-[200px] border-2 border-dashed rounded-lg cursor-pointer transition-colors",
             isDragging
               ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
-              : "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500"
+              : "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500 bg-gray-50 dark:bg-gray-800"
           )}
         >
           <input
             type="file"
             accept={accept}
+            multiple={multiple}
             onChange={handleChange}
             className="hidden"
           />
@@ -125,7 +234,9 @@ export function FileUpload({
           <p className="text-sm text-gray-600 dark:text-gray-300">
             <span className="font-medium text-indigo-600">Click to upload</span> or drag and drop
           </p>
-          <p className="text-xs text-gray-500 mt-1">PDF files only (max 10MB)</p>
+          <p className="text-xs text-gray-500 mt-1">
+            PDF files only (max 10MB){multiple && " • Multiple files supported"}
+          </p>
         </label>
       )}
 

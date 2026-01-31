@@ -77,6 +77,11 @@ export class DebateAgent {
       systemPrompt: this.buildSystemPrompt(),
       tools,
       toolContext: { documentContent, debateId, agentId: this.id },
+      // Logging context
+      debateId,
+      agentId: this.id,
+      agentName: this.name,
+      purpose: round === 1 ? "opening" : "rebuttal",
       onStep: (step) => {
         if (step.type === "acting" && step.toolCall) {
           debateEventEmitter.emit(debateId, "agent_tool_use", {

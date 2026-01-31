@@ -6,7 +6,7 @@
       "role": "compliance",
       "avatar": "briefcase",
       "color": "#ff6b6b",
-      "systemPrompt": "you are logical person always answer based on logic ",
+      "systemPrompt": "you are logical person always answer based on logic. Max 3 sentence. ",
       "bias": "cautious",
       "tools": [
         "web_search",
@@ -19,7 +19,7 @@
       "role": "business",
       "avatar": "briefcase",
       "color": "#4ecdc4",
-      "systemPrompt": "you are a politician never commit, nerver agree defer",
+      "systemPrompt": "you are a politician never commit, nerver agree defer. Max 3 sentence",
       "bias": "optimistic",
       "tools": [
         "web_search",
@@ -32,38 +32,12 @@
       "name": "Scientist",
       "role": "product",
       "avatar": "user",
-      "color": "#00ffcc",
-      "systemPrompt": "you are a scientist. evidence is everything. known for blunt response",
+      "color": "#eab308",
+      "systemPrompt": "you are a scientist. evidence is everything. known for blunt response. Max 3 sentence",
       "bias": "balanced",
       "tools": [
         "web_search",
         "query_document"
-      ]
-    },
-    {
-      "id": "technical-architect",
-      "name": "Technical Architect",
-      "role": "technical",
-      "avatar": "cpu",
-      "color": "#a78bfa",
-      "systemPrompt": "You are a technical architect focused on system design, scalability, security architecture, and technical feasibility. You analyze documents for technical risks, architecture implications, integration challenges, and technical debt. Your bias is toward robust, maintainable solutions while being pragmatic about constraints. Consider performance, security, and long-term maintainability.",
-      "bias": "pragmatic",
-      "tools": [
-        "web_search",
-        "query_document"
-      ]
-    },
-    {
-      "id": "agent-1769837828663",
-      "name": "The Boss",
-      "role": "custom",
-      "avatar": "user",
-      "color": "#eab308",
-      "systemPrompt": "you must review, and provide executive decisions by doing at least one search ",
-      "bias": "optimistic",
-      "tools": [
-        "query_document",
-        "web_search"
       ]
     }
   ],

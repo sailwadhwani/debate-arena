@@ -3,9 +3,90 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ============================================================================
+   CSS VARIABLES - THEME SYSTEM
+   ============================================================================ */
+
 :root {
+  /* Base colors - Light theme */
   --background: #ffffff;
+  --background-secondary: #f8fafc;
   --foreground: #171717;
+  --foreground-muted: #64748b;
+
+  /* Surface colors */
+  --surface: #ffffff;
+  --surface-elevated: #f8fafc;
+  --surface-overlay: rgba(255, 255, 255, 0.95);
+
+  /* Glass morphism */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-bg-strong: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-border-strong: rgba(0, 0, 0, 0.15);
+
+  /* Accent colors */
+  --accent-primary: #0ea5e9;
+  --accent-primary-muted: rgba(14, 165, 233, 0.1);
+  --accent-secondary: #14b8a6;
+
+  /* Status colors */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* Card colors */
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+
+  /* 3D Scene colors - Light mode */
+  --scene-bg: #e8f4fc;
+  --scene-bg-gradient: linear-gradient(180deg, #e8f4fc 0%, #f0f4f8 100%);
+  --particle-color: #0284c7;
+  --particle-color-secondary: #0369a1;
+  --particle-ambient: #64748b;
+  --grid-color: #cbd5e1;
+}
+
+.dark {
+  /* Base colors - Dark theme */
+  --background: #030818;
+  --background-secondary: #0a1525;
+  --foreground: #ededed;
+  --foreground-muted: #94a3b8;
+
+  /* Surface colors */
+  --surface: #0f172a;
+  --surface-elevated: #1e293b;
+  --surface-overlay: rgba(15, 23, 42, 0.95);
+
+  /* Glass morphism */
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-bg-strong: rgba(15, 23, 42, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Accent colors */
+  --accent-primary: #22d3ee;
+  --accent-primary-muted: rgba(34, 211, 238, 0.1);
+  --accent-secondary: #2dd4bf;
+
+  /* Status colors */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* Card colors */
+  --card-bg: #0f172a;
+  --card-border: #1e293b;
+
+  /* 3D Scene colors - Dark mode */
+  --scene-bg: #030014;
+  --scene-bg-gradient: linear-gradient(180deg, #030014 0%, #030818 100%);
+  --particle-color: #00ddff;
+  --particle-color-secondary: #0066aa;
+  --particle-ambient: #4488ff;
+  --grid-color: #0a1525;
 }
 
 @theme inline {
@@ -16,12 +97,9 @@
   --font-rajdhani: 'Rajdhani', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
 
 html {
   scroll-behavior: smooth;
@@ -31,9 +109,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Custom scrollbar for dark mode */
+/* ============================================================================
+   SCROLLBAR STYLES
+   ============================================================================ */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -44,15 +126,18 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(128, 128, 128, 0.3);
+  background: var(--glass-border-strong);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(128, 128, 128, 0.5);
+  background: var(--foreground-muted);
 }
 
-/* Animations */
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
@@ -62,17 +147,114 @@ body {
   }
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(10px);
+  }
+  50% {
+    transform: scale(1.05) translateY(-2px);
+  }
+  70% {
+    transform: scale(0.95) translateY(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+}
+
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Three.js canvas fixes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* ============================================================================
+   GLASS MORPHISM UTILITIES
+   ============================================================================ */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border-strong);
+}
+
+/* ============================================================================
+   THREE.JS CANVAS FIXES
+   ============================================================================ */
+
 canvas {
   display: block;
   touch-action: none;
 }
 
-/* Line clamp utility */
+/* ============================================================================
+   LINE CLAMP UTILITIES
+   ============================================================================ */
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -94,8 +276,278 @@ canvas {
   overflow: hidden;
 }
 
-/* Focus visible for accessibility */
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
 *:focus-visible {
-  outline: 2px solid rgb(99, 102, 241);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
+}
+
+/* ============================================================================
+   SAFE AREA INSETS FOR MOBILE
+   ============================================================================ */
+
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(env(safe-area-inset-top), 16px);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+  }
+
+  .safe-area-left {
+    padding-left: max(env(safe-area-inset-left), 16px);
+  }
+
+  .safe-area-right {
+    padding-right: max(env(safe-area-inset-right), 16px);
+  }
+}
+
+/* ============================================================================
+   MOBILE TOUCH TARGETS
+   ============================================================================ */
+
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ============================================================================
+   PARTICLE BACKGROUND STYLES
+   ============================================================================ */
+
+.particle-bg-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle-bg-container.interactive {
+  pointer-events: auto;
+}
+
+/* ============================================================================
+   FLOATING NAV STYLES
+   ============================================================================ */
+
+.floating-nav {
+  position: fixed;
+  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border-strong);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dark .floating-nav-button {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(34, 211, 238, 0.1);
+}
+
+.floating-nav-button:hover {
+  background: var(--surface);
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+.dark .floating-nav-button:hover {
+  background: rgba(30, 41, 59, 0.95);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5), 0 0 30px rgba(34, 211, 238, 0.15);
+}
+
+.floating-nav-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  min-width: 200px;
+  padding: 8px;
+  border-radius: 16px;
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.floating-nav-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.floating-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  text-decoration: none;
+}
+
+.floating-nav-item:hover {
+  background: var(--accent-primary-muted);
+  color: var(--accent-primary);
+}
+
+.floating-nav-item svg {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+}
+
+.floating-nav-item:hover svg {
+  opacity: 1;
+}
+
+.floating-nav-divider {
+  height: 1px;
+  margin: 8px 0;
+  background: var(--glass-border);
+}
+
+/* ============================================================================
+   THEME TOGGLE STYLES
+   ============================================================================ */
+
+.theme-toggle-group {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--glass-border);
+  border-radius: 10px;
+}
+
+.theme-toggle-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-option:hover {
+  color: var(--foreground);
+}
+
+.theme-toggle-option.active {
+  background: var(--surface);
+  color: var(--accent-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================================
+   SETUP DIALOG STYLES
+   ============================================================================ */
+
+.setup-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.setup-dialog {
+  width: 100%;
+  max-width: 480px;
+  margin: 16px;
+  border-radius: 24px;
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.dark .setup-dialog {
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.setup-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.setup-dialog-content {
+  padding: 24px;
+}
+
+/* ============================================================================
+   RESPONSIVE UTILITIES
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .floating-nav {
+    bottom: 16px;
+    left: 16px;
+    top: auto;
+    right: auto;
+  }
+
+  .floating-nav-menu {
+    bottom: 100%;
+    top: auto;
+    margin-bottom: 8px;
+    margin-top: 0;
+    transform: translateY(10px);
+  }
+
+  .floating-nav-menu.open {
+    transform: translateY(0);
+  }
 }

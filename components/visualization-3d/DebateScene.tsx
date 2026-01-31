@@ -7,7 +7,7 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js";
 import * as THREE from "three";
 import { gsap } from "gsap";
-import type { DebateArgument } from "@/lib/agents/types";
+import type { DebateArgument, DebateSummary } from "@/lib/agents/types";
 
 interface Agent {
   id: string;
@@ -15,7 +15,7 @@ interface Agent {
   color: string;
 }
 
-type DebateStatus = "idle" | "loading" | "debating" | "concluding" | "complete" | "error";
+type DebateStatus = "idle" | "loading" | "debating" | "paused" | "concluding" | "complete" | "error";
 
 interface DebateSceneProps {
   agents: Agent[];
@@ -24,6 +24,9 @@ interface DebateSceneProps {
   arguments?: DebateArgument[];
   status?: DebateStatus;
   thinkingAgentId?: string;
+  summary?: DebateSummary;
+  task?: string;
+  onReset?: () => void;
 }
 
 const PARTICLE_COUNT = 15000;
@@ -323,7 +326,7 @@ function TeleprompterText({ text, agentName, color }: { text: string; agentName:
   const progress = (wordIndex / words.length) * 100;
 
   return (
-    <Html center position={[0, 16, 0]} distanceFactor={50} style={{ width: "550px", pointerEvents: "none" }}>
+    <Html center position={[0, 14, 0]} distanceFactor={50} style={{ width: "550px", pointerEvents: "none" }}>
       <div className="relative">
         {/* Outer glow effect */}
         <div
@@ -478,6 +481,75 @@ function GlowRing({ color, scale = 1 }: { color: string; scale?: number }) {
   );
 }
 
+// Reaction phrases for waiting agents
+const REACTIONS = [
+  "Interesting point... 🤔",
+  "Hmm, I disagree 🙅",
+  "Good point! 👍",
+  "Wait, what? 😕",
+  "That's not right... 😤",
+  "Fair enough 🤷",
+  "Let me think... 💭",
+  "Compelling! ✨",
+  "I have thoughts... 💡",
+  "Not convinced 🧐",
+  "Strong argument 💪",
+  "Debatable... 🤨",
+];
+
+// Reaction bubble component for waiting agents
+function ReactionBubble({ color, index }: { color: string; index: number }) {
+  const [reaction, setReaction] = useState("");
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    // Show reactions at random intervals
+    const showReaction = () => {
+      const randomReaction = REACTIONS[Math.floor(Math.random() * REACTIONS.length)];
+      setReaction(randomReaction);
+      setVisible(true);
+
+      // Hide after 2-3 seconds
+      setTimeout(() => setVisible(false), 2000 + Math.random() * 1000);
+    };
+
+    // Initial delay based on index to stagger reactions
+    const initialDelay = 1000 + index * 800 + Math.random() * 2000;
+    const initialTimeout = setTimeout(showReaction, initialDelay);
+
+    // Show reactions every 4-8 seconds
+    const interval = setInterval(() => {
+      if (Math.random() > 0.4) { // 60% chance to show
+        showReaction();
+      }
+    }, 4000 + Math.random() * 4000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, [index]);
+
+  if (!visible) return null;
+
+  return (
+    <Html center position={[0, 6, 4]} distanceFactor={40} style={{ pointerEvents: "none" }}>
+      <div
+        className="animate-bounce-in px-3 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap"
+        style={{
+          background: `linear-gradient(135deg, ${color}90 0%, ${color}70 100%)`,
+          color: "white",
+          textShadow: "0 1px 2px rgba(0,0,0,0.5)",
+          boxShadow: `0 4px 15px ${color}50`,
+          animation: "bounceIn 0.3s ease-out",
+        }}
+      >
+        {reaction}
+      </div>
+    </Html>
+  );
+}
+
 // Small waiting agent face
 function WaitingAgentFace({
   agent,
@@ -485,12 +557,14 @@ function WaitingAgentFace({
   position,
   index,
   total,
+  isSomeoneSpeaking,
 }: {
   agent: Agent;
   facePositions: Float32Array;
   position: [number, number, number];
   index: number;
   total: number;
+  isSomeoneSpeaking: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
@@ -555,6 +629,11 @@ function WaitingAgentFace({
       <points ref={pointsRef} geometry={geometry}>
         <primitive object={material} ref={materialRef} attach="material" />
       </points>
+
+      {/* Reaction bubble when someone else is speaking */}
+      {isSomeoneSpeaking && (
+        <ReactionBubble color={agent.color} index={index} />
+      )}
 
       {/* Name on neck - simple text */}
       <Html center position={[0, -2.5, 4]} distanceFactor={40} style={{ pointerEvents: "none" }}>
@@ -658,34 +737,54 @@ function MainSpeakingFace({
     });
   }, []);
 
-  // Handle speaking changes
+  // Handle agent on stage changes (thinking or speaking)
   useEffect(() => {
-    if (isSpeaking && agent && facePositions && agent.id !== currentTarget) {
+    if (agent && facePositions && agent.id !== currentTarget) {
+      // Agent is on stage - morph to their face
       morphTo(facePositions, agent.color, 2.0);
       setCurrentTarget(agent.id);
-    } else if (!isSpeaking && currentTarget) {
+    } else if (!agent && currentTarget) {
+      // No agent on stage - return to cloud
       morphTo(cloudPositions, "#0066aa", 1.5);
       setCurrentTarget(null);
     }
-  }, [isSpeaking, agent, facePositions, currentTarget, morphTo, cloudPositions]);
+  }, [agent, facePositions, currentTarget, morphTo, cloudPositions]);
 
-  // Mouse tracking
+  // Pointer tracking (supports both mouse and touch)
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
     };
 
-    const handleMouseLeave = () => {
+    const handlePointerLeave = () => {
       mouse.current.set(-100, -100);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseleave", handleMouseLeave);
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        mouse.current.x = (touch.clientX / window.innerWidth) * 2 - 1;
+        mouse.current.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      mouse.current.set(-100, -100);
+    };
+
+    // Use pointer events for unified handling
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerleave", handlePointerLeave);
+    // Touch events as fallback for older browsers
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerleave", handlePointerLeave);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
     };
   }, []);
 
@@ -728,8 +827,8 @@ function MainSpeakingFace({
         <primitive object={material} ref={materialRef} attach="material" />
       </points>
 
-      {/* Name on neck - simple text */}
-      {agent && isSpeaking && (
+      {/* Name on neck - shows when agent is on stage (thinking or speaking) */}
+      {agent && (
         <Html center position={[0, -6, 8]} distanceFactor={40} style={{ pointerEvents: "none" }}>
           <span
             className="text-lg font-bold tracking-widest uppercase whitespace-nowrap"
@@ -845,8 +944,11 @@ function Scene(props: DebateSceneProps) {
     loadFaceModel().then(setFaceData);
   }, []);
 
-  const speakingAgent = props.agents.find(a => a.id === props.speakingAgentId);
-  const waitingAgents = props.agents.filter(a => a.id !== props.speakingAgentId);
+  // Show agent on stage if they're speaking OR thinking
+  const stageAgentId = props.speakingAgentId || props.thinkingAgentId;
+  const stageAgent = props.agents.find(a => a.id === stageAgentId);
+  const isSpeaking = !!props.speakingAgentId && !!props.currentArgument;
+  const waitingAgents = props.agents.filter(a => a.id !== stageAgentId);
 
   // Calculate waiting agent positions at bottom - visible in camera view
   const getWaitingPosition = (index: number, total: number): [number, number, number] => {
@@ -863,12 +965,12 @@ function Scene(props: DebateSceneProps) {
       {/* Atmospheric elements */}
       <AmbientParticles />
 
-      {/* Main speaking face (center stage) */}
+      {/* Main face on stage - shows for thinking or speaking agent */}
       <MainSpeakingFace
-        agent={speakingAgent || null}
+        agent={stageAgent || null}
         facePositions={faceData?.large || null}
         cloudPositions={cloudPositions}
-        isSpeaking={!!speakingAgent}
+        isSpeaking={isSpeaking}
         currentArgument={props.currentArgument}
       />
 
@@ -881,6 +983,7 @@ function Scene(props: DebateSceneProps) {
           position={getWaitingPosition(index, waitingAgents.length)}
           index={index}
           total={waitingAgents.length}
+          isSomeoneSpeaking={isSpeaking}
         />
       ))}
     </>
@@ -888,24 +991,13 @@ function Scene(props: DebateSceneProps) {
 }
 
 export function DebateScene(props: DebateSceneProps) {
-  // Debug: log props changes
-  useEffect(() => {
-    console.log("[DebateScene] Props updated:", {
-      status: props.status,
-      speakingAgentId: props.speakingAgentId,
-      thinkingAgentId: props.thinkingAgentId,
-      hasCurrentArgument: !!props.currentArgument,
-      argumentsCount: props.arguments?.length || 0,
-      agentsCount: props.agents?.length || 0,
-    });
-  }, [props.status, props.speakingAgentId, props.thinkingAgentId, props.currentArgument, props.arguments, props.agents]);
-
   return (
-    <div className="absolute inset-0 bg-[#030014]">
+    <div className="absolute inset-0 bg-[var(--scene-bg)]" style={{ touchAction: "none" }}>
       <Canvas
         camera={{ position: [0, 0, 45], fov: 50 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, 2]}
+        style={{ touchAction: "none" }}
       >
         <color attach="background" args={["#030014"]} />
         <Suspense fallback={null}>
@@ -913,16 +1005,6 @@ export function DebateScene(props: DebateSceneProps) {
         </Suspense>
       </Canvas>
 
-      {/* Debug panel - bottom left */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="absolute bottom-4 left-4 z-50 p-3 rounded-lg bg-black/80 text-xs font-mono text-white/70 max-w-xs">
-          <div>Status: <span className="text-cyan-400">{props.status || "idle"}</span></div>
-          <div>Speaking: <span className="text-green-400">{props.speakingAgentId || "none"}</span></div>
-          <div>Thinking: <span className="text-yellow-400">{props.thinkingAgentId || "none"}</span></div>
-          <div>Has Argument: <span className="text-purple-400">{props.currentArgument ? "yes" : "no"}</span></div>
-          <div>Total Args: <span className="text-blue-400">{props.arguments?.length || 0}</span></div>
-        </div>
-      )}
 
       {/* Status Indicator */}
       {props.status && props.status !== "idle" && (
@@ -1008,8 +1090,8 @@ export function DebateScene(props: DebateSceneProps) {
             </div>
           )}
 
-          {/* Complete */}
-          {props.status === "complete" && (
+          {/* Complete - just show small badge, summary overlay handles the rest */}
+          {props.status === "complete" && !props.summary && (
             <div
               className="flex items-center gap-4 px-6 py-3 rounded-full backdrop-blur-xl"
               style={{
@@ -1022,6 +1104,140 @@ export function DebateScene(props: DebateSceneProps) {
               <span className="text-green-300 text-sm font-medium tracking-widest uppercase">Debate Complete</span>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Summary Overlay - Shows when debate is complete */}
+      {props.status === "complete" && props.summary && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center p-4 sm:p-8">
+          <div
+            className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl animate-fade-in"
+            style={{
+              background: "linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)",
+              border: "1px solid rgba(34, 211, 238, 0.2)",
+              boxShadow: "0 0 80px rgba(34, 211, 238, 0.15), 0 25px 50px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            {/* Header */}
+            <div
+              className="p-6 border-b border-cyan-500/20"
+              style={{
+                background: "linear-gradient(90deg, rgba(34, 211, 238, 0.1) 0%, transparent 50%, rgba(34, 211, 238, 0.1) 100%)",
+              }}
+            >
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <span className="w-3 h-3 rounded-full bg-green-400 shadow-lg shadow-green-400/50 animate-pulse" />
+                <h2 className="text-2xl font-bold text-white tracking-wide">Debate Complete</h2>
+                <span className="w-3 h-3 rounded-full bg-green-400 shadow-lg shadow-green-400/50 animate-pulse" />
+              </div>
+              {props.task && (
+                <p className="text-center text-cyan-300/70 text-sm">{props.task}</p>
+              )}
+            </div>
+
+            {/* Consensus Meter */}
+            <div className="p-6 border-b border-white/5">
+              <div className="text-center mb-4">
+                <span className="text-sm font-medium text-cyan-300 uppercase tracking-widest">Consensus Level</span>
+              </div>
+              <div className="relative h-4 rounded-full overflow-hidden bg-white/5">
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-out"
+                  style={{
+                    width: `${props.summary.consensus}%`,
+                    background: props.summary.consensus >= 70
+                      ? "linear-gradient(90deg, #22c55e, #4ade80)"
+                      : props.summary.consensus >= 40
+                      ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
+                      : "linear-gradient(90deg, #ef4444, #f87171)",
+                    boxShadow: props.summary.consensus >= 70
+                      ? "0 0 20px rgba(34, 197, 94, 0.5)"
+                      : props.summary.consensus >= 40
+                      ? "0 0 20px rgba(245, 158, 11, 0.5)"
+                      : "0 0 20px rgba(239, 68, 68, 0.5)",
+                  }}
+                />
+              </div>
+              <div className="flex justify-between mt-2 text-xs text-white/50">
+                <span>Divided</span>
+                <span className="text-lg font-bold text-white">{props.summary.consensus}%</span>
+                <span>Unified</span>
+              </div>
+            </div>
+
+            {/* Key Points */}
+            <div className="p-6 space-y-6">
+              {/* Agreements */}
+              {props.summary.keyAgreements.length > 0 && (
+                <div>
+                  <h3 className="flex items-center gap-2 text-green-400 font-semibold mb-3">
+                    <span className="text-lg">✓</span> Key Agreements
+                  </h3>
+                  <ul className="space-y-2">
+                    {props.summary.keyAgreements.map((point, i) => (
+                      <li key={i} className="flex gap-3 text-sm text-white/80">
+                        <span className="text-green-400/50">•</span>
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Disagreements */}
+              {props.summary.keyDisagreements.length > 0 && (
+                <div>
+                  <h3 className="flex items-center gap-2 text-orange-400 font-semibold mb-3">
+                    <span className="text-lg">✗</span> Key Disagreements
+                  </h3>
+                  <ul className="space-y-2">
+                    {props.summary.keyDisagreements.map((point, i) => (
+                      <li key={i} className="flex gap-3 text-sm text-white/80">
+                        <span className="text-orange-400/50">•</span>
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Recommendation */}
+              <div
+                className="p-4 rounded-2xl"
+                style={{
+                  background: "linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(34, 211, 238, 0.05) 100%)",
+                  border: "1px solid rgba(34, 211, 238, 0.2)",
+                }}
+              >
+                <h3 className="flex items-center gap-2 text-cyan-400 font-semibold mb-2">
+                  <span className="text-lg">💡</span> Recommendation
+                </h3>
+                <p className="text-white/90 text-sm leading-relaxed">{props.summary.recommendation}</p>
+              </div>
+
+              {/* Reasoning (collapsible feel) */}
+              {props.summary.reasoning && (
+                <div className="pt-2">
+                  <h3 className="text-white/50 text-xs font-medium uppercase tracking-wider mb-2">Reasoning</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">{props.summary.reasoning}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer with action */}
+            <div className="p-6 border-t border-white/5">
+              <button
+                onClick={props.onReset}
+                className="w-full py-3 px-6 rounded-xl font-medium text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: "linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%)",
+                  boxShadow: "0 4px 20px rgba(14, 165, 233, 0.3)",
+                }}
+              >
+                Start New Debate
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

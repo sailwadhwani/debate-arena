@@ -8,6 +8,7 @@ import { createLLMClientFromEnv } from "../llm/client";
 import { executeReActLoop, type ReActStep } from "../llm/react-loop";
 import { toolRegistry } from "../tools/registry";
 import { debateEventEmitter } from "../events/emitter";
+import { logLLMCall } from "../llm/logging-service";
 
 export interface ModeratorContext {
   debateId: string;
@@ -71,6 +72,11 @@ export class ModeratorAgent {
     const result = await executeReActLoop(this.client, prompt, {
       systemPrompt: this.buildSystemPrompt(),
       tools,
+      // Logging context
+      debateId,
+      agentId: this.id,
+      agentName: this.name,
+      purpose: "moderator",
       onStep: (step) => {
         const moderatorStep = this.convertToModeratorStep(step);
         steps.push(moderatorStep);
@@ -120,10 +126,28 @@ export class ModeratorAgent {
       },
     });
 
+    const callStartTime = Date.now();
     const response = await this.client.complete({
       systemPrompt: this.config.systemPrompt,
       userPrompt: prompt,
     });
+    const callDurationMs = Date.now() - callStartTime;
+
+    // Log this summary generation call
+    logLLMCall({
+      provider: this.client.provider,
+      model: this.client.model,
+      durationMs: callDurationMs,
+      systemPrompt: this.config.systemPrompt,
+      userPrompt: prompt,
+      response: response.content,
+      tokensUsed: response.tokensUsed,
+      success: true,
+      purpose: "summary",
+      agentId: this.id,
+      agentName: this.name,
+      debateId,
+    }).catch(() => {}); // Fire and forget
 
     return this.parseSummary(response.content);
   }

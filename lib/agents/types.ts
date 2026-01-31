@@ -40,7 +40,7 @@ export interface AgentsConfig {
 }
 
 // Debate State Types
-export type DebateStatus = "idle" | "loading" | "debating" | "concluding" | "complete" | "error";
+export type DebateStatus = "idle" | "loading" | "debating" | "paused" | "concluding" | "complete" | "error";
 
 export interface DebateArgument {
   id: string;

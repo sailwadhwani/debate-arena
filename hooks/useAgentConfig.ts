@@ -11,6 +11,7 @@ interface UseAgentConfigResult {
   updateAgent: (id: string, updates: Partial<AgentConfig>) => Promise<void>;
   addAgent: (agent: AgentConfig) => Promise<void>;
   deleteAgent: (id: string) => Promise<void>;
+  reorderAgents: (agentIds: string[]) => Promise<void>;
 }
 
 export function useAgentConfig(): UseAgentConfigResult {
@@ -94,6 +95,38 @@ export function useAgentConfig(): UseAgentConfigResult {
     }
   }, [fetchConfig]);
 
+  const reorderAgents = useCallback(async (agentIds: string[]) => {
+    if (!config) return;
+
+    try {
+      // Reorder agents based on the provided ID order
+      const reorderedAgents = agentIds
+        .map(id => config.agents.find(a => a.id === id))
+        .filter((a): a is AgentConfig => a !== undefined);
+
+      const newConfig = {
+        ...config,
+        agents: reorderedAgents,
+      };
+
+      const response = await fetch("/api/agents", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "saveAll", config: newConfig }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to reorder agents");
+      }
+
+      // Update local state immediately for responsiveness
+      setConfig(newConfig);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unknown error");
+      throw e;
+    }
+  }, [config]);
+
   useEffect(() => {
     fetchConfig();
   }, [fetchConfig]);
@@ -106,5 +139,6 @@ export function useAgentConfig(): UseAgentConfigResult {
     updateAgent,
     addAgent,
     deleteAgent,
+    reorderAgents,
   };
 }

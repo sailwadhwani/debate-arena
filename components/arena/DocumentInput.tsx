@@ -1,25 +1,61 @@
 "use client";
 
-import { useState } from "react";
-import { FileText, Link, Type, CheckCircle } from "lucide-react";
+import { useState, useCallback } from "react";
+import { FileText, Link, Type, CheckCircle, X } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
 import { FileUpload } from "@/components/ui/FileUpload";
 
-interface DocumentInputProps {
-  onDocumentLoaded: (content: string, name: string, source: string) => void;
+export interface LoadedDocument {
+  id: string;
+  name: string;
+  source: "pdf" | "url" | "text";
+  content: string;
+  wordCount: number;
 }
 
-export function DocumentInput({ onDocumentLoaded }: DocumentInputProps) {
+interface DocumentInputProps {
+  onDocumentLoaded: (content: string, name: string, source: string) => void;
+  onDocumentsChange?: (documents: LoadedDocument[]) => void;
+  multiple?: boolean;
+}
+
+export function DocumentInput({
+  onDocumentLoaded,
+  onDocumentsChange,
+  multiple = true
+}: DocumentInputProps) {
   const [urlInput, setUrlInput] = useState("");
   const [textInput, setTextInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loaded, setLoaded] = useState<{
-    name: string;
-    source: string;
-    wordCount: number;
-  } | null>(null);
+  const [documents, setDocuments] = useState<LoadedDocument[]>([]);
+
+  const addDocument = useCallback((doc: LoadedDocument) => {
+    const updatedDocs = multiple ? [...documents, doc] : [doc];
+    setDocuments(updatedDocs);
+    onDocumentsChange?.(updatedDocs);
+    // Also call the legacy single-doc callback with combined content
+    const combinedContent = updatedDocs.map(d => d.content).join("\n\n---\n\n");
+    const combinedName = updatedDocs.map(d => d.name).join(", ");
+    onDocumentLoaded(combinedContent, combinedName, doc.source);
+  }, [documents, multiple, onDocumentsChange, onDocumentLoaded]);
+
+  const removeDocument = useCallback((id: string) => {
+    const updatedDocs = documents.filter(d => d.id !== id);
+    setDocuments(updatedDocs);
+    onDocumentsChange?.(updatedDocs);
+    if (updatedDocs.length > 0) {
+      const combinedContent = updatedDocs.map(d => d.content).join("\n\n---\n\n");
+      const combinedName = updatedDocs.map(d => d.name).join(", ");
+      onDocumentLoaded(combinedContent, combinedName, updatedDocs[0].source);
+    }
+  }, [documents, onDocumentsChange, onDocumentLoaded]);
+
+  const clearAllDocuments = useCallback(() => {
+    setDocuments([]);
+    onDocumentsChange?.([]);
+  }, [onDocumentsChange]);
 
   const handlePdfUpload = async (file: File) => {
     setError(null);
@@ -40,12 +76,13 @@ export function DocumentInput({ onDocumentLoaded }: DocumentInputProps) {
       }
 
       const data = await response.json();
-      setLoaded({
+      addDocument({
+        id: `pdf-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
         name: data.name,
         source: "pdf",
+        content: data.content,
         wordCount: data.wordCount,
       });
-      onDocumentLoaded(data.content, data.name, "pdf");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload file");
     } finally {
@@ -75,12 +112,14 @@ export function DocumentInput({ onDocumentLoaded }: DocumentInputProps) {
       }
 
       const data = await response.json();
-      setLoaded({
+      addDocument({
+        id: `url-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
         name: data.name,
         source: "url",
+        content: data.content,
         wordCount: data.wordCount,
       });
-      onDocumentLoaded(data.content, data.name, "url");
+      setUrlInput("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch URL");
     } finally {
@@ -96,33 +135,77 @@ export function DocumentInput({ onDocumentLoaded }: DocumentInputProps) {
 
     setError(null);
     const wordCount = textInput.split(/\s+/).filter((w) => w).length;
-    setLoaded({
+    addDocument({
+      id: `text-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       name: "Pasted Text",
       source: "text",
+      content: textInput,
       wordCount,
     });
-    onDocumentLoaded(textInput, "Pasted Text", "text");
+    setTextInput("");
   };
 
-  if (loaded) {
+  const totalWordCount = documents.reduce((sum, d) => sum + d.wordCount, 0);
+
+  // Show loaded documents summary
+  if (documents.length > 0) {
     return (
-      <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-        <div className="flex items-center gap-3">
-          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-          <div className="flex-1">
-            <div className="font-medium text-green-700 dark:text-green-300">
-              Document Loaded
-            </div>
-            <div className="text-sm text-green-600 dark:text-green-400">
-              {loaded.name} ({loaded.wordCount.toLocaleString()} words)
-            </div>
+      <div className="space-y-3">
+        {/* Documents list */}
+        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <span className="font-medium text-green-700 dark:text-green-300 text-sm">
+              {documents.length} document{documents.length > 1 ? "s" : ""} loaded ({totalWordCount.toLocaleString()} words total)
+            </span>
           </div>
+
+          <div className="space-y-2">
+            {documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded border border-green-100 dark:border-green-900"
+              >
+                <FileText className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900 dark:text-white truncate">
+                    {doc.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {doc.wordCount.toLocaleString()} words • {doc.source.toUpperCase()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => removeDocument(doc.id)}
+                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Remove document"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Add more or clear */}
+        <div className="flex items-center gap-2">
+          {multiple && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAllDocuments}
+              className="flex-1"
+            >
+              Clear All
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setLoaded(null)}
+            onClick={() => setDocuments([])}
+            className="flex-1"
           >
-            Change
+            {multiple ? "Add More" : "Change"}
           </Button>
         </div>
       </div>
@@ -147,35 +230,39 @@ export function DocumentInput({ onDocumentLoaded }: DocumentInputProps) {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pdf">
-          <FileUpload onUpload={handlePdfUpload} />
+        <TabsContent value="pdf" className="min-h-[200px]">
+          <FileUpload onUpload={handlePdfUpload} multiple={multiple} />
         </TabsContent>
 
-        <TabsContent value="url">
-          <div className="space-y-3">
-            <input
-              type="url"
-              value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
-              placeholder="https://example.com/document"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            />
-            <Button onClick={handleUrlFetch} loading={loading} className="w-full">
+        <TabsContent value="url" className="min-h-[200px]">
+          <div className="flex flex-col h-[200px]">
+            <div className="flex-1 flex flex-col justify-center">
+              <input
+                type="url"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder="https://example.com/document"
+                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Enter a URL to fetch document content
+              </p>
+            </div>
+            <Button onClick={handleUrlFetch} loading={loading} className="w-full mt-3">
               Fetch Content
             </Button>
           </div>
         </TabsContent>
 
-        <TabsContent value="text">
-          <div className="space-y-3">
+        <TabsContent value="text" className="min-h-[200px]">
+          <div className="flex flex-col h-[200px]">
             <textarea
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
               placeholder="Paste your document content here..."
-              rows={6}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+              className="flex-1 w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
             />
-            <Button onClick={handleTextSubmit} className="w-full">
+            <Button onClick={handleTextSubmit} className="w-full mt-3">
               Use This Text
             </Button>
           </div>

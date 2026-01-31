@@ -20,8 +20,11 @@ interface UseDebateStreamResult {
   moderatorSteps: ModeratorStep[];
   summary: DebateSummary | undefined;
   error: string | undefined;
+  debateId: string | null;
   connect: (debateId: string) => void;
   disconnect: () => void;
+  pause: () => Promise<boolean>;
+  resume: () => Promise<boolean>;
 }
 
 export function useDebateStream(): UseDebateStreamResult {
@@ -34,12 +37,15 @@ export function useDebateStream(): UseDebateStreamResult {
   const [summary, setSummary] = useState<DebateSummary | undefined>();
   const [error, setError] = useState<string | undefined>();
   const eventSourceRef = useRef<EventSource | null>(null);
+  const debateIdRef = useRef<string | null>(null);
 
   const connect = useCallback((debateId: string) => {
     // Close existing connection
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
     }
+
+    debateIdRef.current = debateId;
 
     // Reset state
     setStatus("loading");
@@ -74,6 +80,67 @@ export function useDebateStream(): UseDebateStreamResult {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
+    }
+    debateIdRef.current = null;
+
+    // Reset all state
+    setStatus("idle");
+    setRounds([]);
+    setCurrentRound(0);
+    setSpeakingAgent(undefined);
+    setThinkingAgent(undefined);
+    setModeratorSteps([]);
+    setSummary(undefined);
+    setError(undefined);
+  }, []);
+
+  const pause = useCallback(async (): Promise<boolean> => {
+    if (!debateIdRef.current) return false;
+
+    try {
+      const response = await fetch(`/api/debate/${debateIdRef.current}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "pause" }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error || "Failed to pause debate");
+        return false;
+      }
+
+      setStatus("paused");
+      setSpeakingAgent(undefined);
+      setThinkingAgent(undefined);
+      return true;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to pause debate");
+      return false;
+    }
+  }, []);
+
+  const resume = useCallback(async (): Promise<boolean> => {
+    if (!debateIdRef.current) return false;
+
+    try {
+      const response = await fetch(`/api/debate/${debateIdRef.current}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "resume" }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error || "Failed to resume debate");
+        return false;
+      }
+
+      setStatus("debating");
+      return true;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to resume debate");
+      return false;
     }
   }, []);
 
@@ -189,6 +256,17 @@ export function useDebateStream(): UseDebateStreamResult {
         setStatus("error");
         setError(event.data.error);
         break;
+
+      // Handle pause/resume events
+      case "debate_paused" as any:
+        setStatus("paused");
+        setSpeakingAgent(undefined);
+        setThinkingAgent(undefined);
+        break;
+
+      case "debate_resumed" as any:
+        setStatus("debating");
+        break;
     }
   }, []);
 
@@ -214,7 +292,10 @@ export function useDebateStream(): UseDebateStreamResult {
     moderatorSteps,
     summary,
     error,
+    debateId: debateIdRef.current,
     connect,
     disconnect,
+    pause,
+    resume,
   };
 }

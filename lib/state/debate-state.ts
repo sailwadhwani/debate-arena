@@ -129,6 +129,44 @@ class DebateStateManager {
   }
 
   /**
+   * Pause a debate
+   */
+  pause(debateId: string): DebateState | undefined {
+    const state = this.states.get(debateId);
+    if (!state) return undefined;
+
+    // Only allow pausing during active debate
+    if (state.status === "debating") {
+      state.status = "paused";
+    }
+
+    return state;
+  }
+
+  /**
+   * Resume a paused debate
+   */
+  resume(debateId: string): DebateState | undefined {
+    const state = this.states.get(debateId);
+    if (!state) return undefined;
+
+    // Only allow resuming from paused state
+    if (state.status === "paused") {
+      state.status = "debating";
+    }
+
+    return state;
+  }
+
+  /**
+   * Check if debate is paused
+   */
+  isPaused(debateId: string): boolean {
+    const state = this.states.get(debateId);
+    return state?.status === "paused";
+  }
+
+  /**
    * Set error state
    */
   setError(debateId: string, error: string): DebateState | undefined {

@@ -2,25 +2,129 @@
 
 import { useCallback, useMemo, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { DocumentInput } from "./DocumentInput";
 import { TaskInput } from "./TaskInput";
-import { ViewToggle } from "./ViewToggle";
-import { DebateControls } from "./DebateControls";
 import { DebateTimeline } from "@/components/visualization-2d/DebateTimeline";
 import { ConsensusVisualization } from "@/components/visualization-2d/ConsensusVisualization";
 import { ModeratorPanel } from "@/components/moderator/ModeratorPanel";
+import { FloatingNav } from "@/components/nav/FloatingNav";
 import { useDebateStream } from "@/hooks/useDebateStream";
 import { useAgentConfig } from "@/hooks/useAgentConfig";
 import { useDebateContext } from "@/contexts/DebateContext";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { X, MessageSquare, ChevronRight, ChevronLeft } from "lucide-react";
+import { X, MessageSquare, ChevronRight, ChevronLeft, Pause, Play, Sparkles } from "lucide-react";
 
-// Dynamically import 3D scene to avoid SSR issues
+// Dynamically import 3D scene and ParticleBackground to avoid SSR issues
 const DebateScene = dynamic(
   () => import("@/components/visualization-3d/DebateScene").then((m) => m.DebateScene),
-  { ssr: false, loading: () => <div className="absolute inset-0 bg-[#030818] animate-pulse" /> }
+  { ssr: false, loading: () => <div className="absolute inset-0 bg-[var(--scene-bg)] animate-pulse" /> }
 );
+
+const ParticleBackground = dynamic(
+  () => import("@/components/shared/ParticleBackground").then((m) => m.ParticleBackground),
+  { ssr: false }
+);
+
+// Unified Setup Dialog Component
+function SetupDialog({
+  isOpen,
+  onClose,
+  task,
+  onTaskChange,
+  onDocumentLoaded,
+  agents,
+  selectedAgents,
+  onAgentToggle,
+  onStart,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  task: string;
+  onTaskChange: (task: string) => void;
+  onDocumentLoaded: (content: string, name: string) => void;
+  agents: Array<{ id: string; name: string; color: string }>;
+  selectedAgents: string[];
+  onAgentToggle: (agentId: string) => void;
+  onStart: () => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="setup-dialog-overlay" onClick={onClose}>
+      <div className="setup-dialog" onClick={(e) => e.stopPropagation()}>
+        <div className="setup-dialog-header">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-[var(--accent-primary-muted)]">
+              <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
+            </div>
+            <h2 className="text-lg font-semibold text-[var(--foreground)]">Start a Debate</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-[var(--glass-border)] text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="setup-dialog-content space-y-5">
+          {/* Document input */}
+          <div>
+            <label className="text-sm font-medium text-[var(--foreground-muted)] mb-2 block">
+              Document (Optional)
+            </label>
+            <DocumentInput onDocumentLoaded={onDocumentLoaded} />
+          </div>
+
+          {/* Task input */}
+          <TaskInput value={task} onChange={onTaskChange} />
+
+          {/* Agent selection */}
+          <div>
+            <label className="text-sm font-medium text-[var(--foreground-muted)] mb-2 block">
+              Select Agents
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {agents.map((agent) => (
+                <button
+                  key={agent.id}
+                  onClick={() => onAgentToggle(agent.id)}
+                  className={`px-3 py-1.5 text-sm rounded-full border transition-all ${
+                    selectedAgents.includes(agent.id) || selectedAgents.length === 0
+                      ? "border-transparent text-white"
+                      : "border-[var(--glass-border)] text-[var(--foreground-muted)] bg-[var(--surface)]"
+                  }`}
+                  style={{
+                    backgroundColor:
+                      selectedAgents.includes(agent.id) || selectedAgents.length === 0
+                        ? agent.color
+                        : undefined,
+                  }}
+                >
+                  {agent.name}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-[var(--foreground-muted)] mt-2">
+              {selectedAgents.length === 0
+                ? "All agents will participate"
+                : `${selectedAgents.length} agent(s) selected`}
+            </p>
+          </div>
+
+          {/* Start button */}
+          <button
+            onClick={onStart}
+            disabled={!task.trim()}
+            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-medium hover:from-cyan-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-500/25"
+          >
+            Start Debate
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function DebateArena() {
   // Use context for persistent state
@@ -137,18 +241,34 @@ export function DebateArena() {
     ctx.resetDebate();
   }, [debateStream, ctx]);
 
+  const handlePause = useCallback(async () => {
+    const success = await debateStream.pause();
+    if (success) {
+      ctx.setStatus("paused");
+    }
+  }, [debateStream, ctx]);
+
+  const handleResume = useCallback(async () => {
+    const success = await debateStream.resume();
+    if (success) {
+      ctx.setStatus("debating");
+    }
+  }, [debateStream, ctx]);
+
   if (configLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="fixed inset-0 flex items-center justify-center bg-[var(--background)]">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  // Full-screen 3D mode
+  const allConfigAgents = config?.agents.map((a) => ({ id: a.id, name: a.name, color: a.color })) || [];
+
+  // 3D View - Full immersive experience
   if (ctx.view === "3d") {
     return (
-      <div className="fixed inset-0 z-50">
+      <div className="fixed inset-0">
         {/* 3D Scene - Full screen */}
         <DebateScene
           agents={agents}
@@ -157,134 +277,103 @@ export function DebateArena() {
           arguments={allArguments}
           status={status}
           thinkingAgentId={thinkingAgent}
+          summary={summary}
+          task={ctx.task}
+          onReset={handleReset}
         />
 
-        {/* Top bar with controls */}
-        <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-20">
-          <div className="flex items-center gap-3">
-            <div className="px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
-              <span className="text-white font-semibold">Debate Arena</span>
-            </div>
-            {status !== "idle" && (
-              <div className="px-3 py-1.5 rounded-full bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 text-cyan-400 text-sm">
-                Round {currentRound}
+        {/* Floating Navigation */}
+        <FloatingNav
+          view={ctx.view}
+          onViewChange={ctx.setView}
+          showViewToggle={true}
+          position="top-left"
+        />
+
+        {/* Top bar with status - hide when complete (summary overlay is shown) */}
+        {status !== "complete" && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+            <div className="flex items-center gap-3">
+              <div className="px-4 py-2 rounded-full glass">
+                <span className="font-semibold text-[var(--foreground)]">Debate Arena</span>
               </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <ViewToggle view={ctx.view} onChange={ctx.setView} />
-            {status !== "idle" && (
-              <button
-                onClick={handleReset}
-                className="px-3 py-2 rounded-lg bg-red-500/20 backdrop-blur-md border border-red-500/30 text-red-400 text-sm hover:bg-red-500/30 transition-colors"
-              >
-                End Debate
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Setup Panel - Floating overlay */}
-        {ctx.showSetup && status === "idle" && (
-          <div className="absolute inset-0 flex items-center justify-center z-30 bg-black/50 backdrop-blur-sm">
-            <div className="w-full max-w-lg mx-4">
-              <Card className="bg-gray-900/90 border-gray-700 backdrop-blur-xl shadow-2xl">
-                <CardHeader className="flex flex-row items-center justify-between border-b border-gray-700">
-                  <h2 className="font-semibold text-white text-lg">Start a Debate</h2>
-                  <button
-                    onClick={() => ctx.setShowSetup(false)}
-                    className="p-1 rounded hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </CardHeader>
-                <CardContent className="space-y-5 pt-5">
-                  {/* Document input */}
-                  <div>
-                    <label className="text-sm font-medium text-gray-300 mb-2 block">
-                      Document (Optional)
-                    </label>
-                    <DocumentInput onDocumentLoaded={handleDocumentLoaded} />
-                  </div>
-
-                  {/* Task input */}
-                  <TaskInput value={ctx.task} onChange={ctx.setTask} />
-
-                  {/* Agent selection */}
-                  <div>
-                    <label className="text-sm font-medium text-gray-300 mb-2 block">
-                      Select Agents
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {config?.agents.map((agent) => (
-                        <button
-                          key={agent.id}
-                          onClick={() => handleAgentToggle(agent.id)}
-                          className={`px-3 py-1.5 text-sm rounded-full border transition-all ${
-                            ctx.selectedAgents.includes(agent.id) || ctx.selectedAgents.length === 0
-                              ? "border-transparent text-white"
-                              : "border-gray-600 text-gray-400 bg-gray-800"
-                          }`}
-                          style={{
-                            backgroundColor:
-                              ctx.selectedAgents.includes(agent.id) || ctx.selectedAgents.length === 0
-                                ? agent.color
-                                : undefined,
-                          }}
-                        >
-                          {agent.name}
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {ctx.selectedAgents.length === 0
-                        ? "All agents will participate"
-                        : `${ctx.selectedAgents.length} agent(s) selected`}
-                    </p>
-                  </div>
-
-                  {/* Start button */}
-                  <button
-                    onClick={handleStart}
-                    disabled={!ctx.task.trim()}
-                    className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-medium hover:from-cyan-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-500/25"
-                  >
-                    Start Debate
-                  </button>
-                </CardContent>
-              </Card>
+              {status !== "idle" && (
+                <div className="px-3 py-1.5 rounded-full bg-[var(--accent-primary-muted)] border border-[var(--accent-primary)]/30 text-[var(--accent-primary)] text-sm">
+                  Round {currentRound}
+                </div>
+              )}
             </div>
           </div>
         )}
+
+        {/* Control buttons - hide when complete */}
+        <div className={`absolute top-4 right-4 z-10 flex items-center gap-2 safe-area-right ${status === "complete" ? "hidden" : ""}`}>
+          {(status === "debating" || status === "paused") && (
+            <>
+              {status === "debating" ? (
+                <button
+                  onClick={handlePause}
+                  className="px-3 py-2 rounded-lg glass text-amber-500 text-sm hover:bg-amber-500/10 transition-colors flex items-center gap-2"
+                >
+                  <Pause className="w-4 h-4" />
+                  <span className="hidden sm:inline">Pause</span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleResume}
+                  className="px-3 py-2 rounded-lg glass text-green-500 text-sm hover:bg-green-500/10 transition-colors flex items-center gap-2"
+                >
+                  <Play className="w-4 h-4" />
+                  <span className="hidden sm:inline">Resume</span>
+                </button>
+              )}
+            </>
+          )}
+          {status !== "idle" && status !== "complete" && (
+            <button
+              onClick={handleReset}
+              className="px-3 py-2 rounded-lg glass text-red-500 text-sm hover:bg-red-500/10 transition-colors"
+            >
+              End Debate
+            </button>
+          )}
+        </div>
+
+        {/* Unified Setup Dialog */}
+        <SetupDialog
+          isOpen={ctx.showSetup && status === "idle"}
+          onClose={() => ctx.setShowSetup(false)}
+          task={ctx.task}
+          onTaskChange={ctx.setTask}
+          onDocumentLoaded={handleDocumentLoaded}
+          agents={allConfigAgents}
+          selectedAgents={ctx.selectedAgents}
+          onAgentToggle={handleAgentToggle}
+          onStart={handleStart}
+        />
 
         {/* Floating setup button when panel is closed */}
         {!ctx.showSetup && status === "idle" && (
           <button
             onClick={() => ctx.setShowSetup(true)}
-            className="absolute bottom-6 right-6 z-20 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-medium hover:from-cyan-600 hover:to-teal-600 transition-all shadow-lg shadow-cyan-500/25"
+            className="absolute bottom-6 right-6 z-20 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-medium hover:from-cyan-600 hover:to-teal-600 transition-all shadow-lg shadow-cyan-500/25 safe-area-bottom safe-area-right"
           >
             Setup Debate
           </button>
         )}
 
-        {/* Moderator Panel - Collapsible side overlay during debate */}
-        {status !== "idle" && (
+        {/* Moderator Panel - Collapsible side overlay during debate (hide when complete) */}
+        {status !== "idle" && status !== "complete" && (
           <>
             {/* Collapsed state - small toggle button */}
             {!showModeratorPanel && (
               <button
                 onClick={() => setShowModeratorPanel(true)}
-                className="absolute top-20 right-4 z-20 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
-                style={{
-                  background: "linear-gradient(135deg, rgba(0,200,255,0.15) 0%, rgba(0,100,200,0.1) 100%)",
-                  border: "1px solid rgba(0,200,255,0.3)",
-                  boxShadow: "0 0 20px rgba(0,200,255,0.2)",
-                }}
+                className="absolute top-20 right-4 z-20 flex items-center gap-2 px-3 py-2 rounded-lg glass transition-all hover:scale-105 safe-area-right"
               >
-                <MessageSquare className="w-4 h-4 text-cyan-400" />
-                <span className="text-cyan-300 text-sm font-medium">Moderator</span>
-                <ChevronLeft className="w-4 h-4 text-cyan-400" />
+                <MessageSquare className="w-4 h-4 text-[var(--accent-primary)]" />
+                <span className="text-[var(--accent-primary)] text-sm font-medium">Moderator</span>
+                <ChevronLeft className="w-4 h-4 text-[var(--accent-primary)]" />
               </button>
             )}
 
@@ -297,17 +386,12 @@ export function DebateArena() {
               {/* Close button */}
               <button
                 onClick={() => setShowModeratorPanel(false)}
-                className="absolute -left-10 top-2 z-30 flex items-center justify-center w-8 h-8 rounded-l-lg transition-all hover:scale-105"
-                style={{
-                  background: "linear-gradient(135deg, rgba(0,200,255,0.2) 0%, rgba(0,100,200,0.15) 100%)",
-                  border: "1px solid rgba(0,200,255,0.3)",
-                  borderRight: "none",
-                }}
+                className="absolute -left-10 top-2 z-30 flex items-center justify-center w-8 h-8 rounded-l-lg glass transition-all hover:scale-105"
               >
-                <ChevronRight className="w-4 h-4 text-cyan-400" />
+                <ChevronRight className="w-4 h-4 text-[var(--accent-primary)]" />
               </button>
 
-              <div className="h-full overflow-auto rounded-l-xl bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 border-r-0 shadow-2xl mr-0">
+              <div className="h-full overflow-auto rounded-l-xl glass-strong mr-0 safe-area-right">
                 <ModeratorPanel
                   steps={moderatorSteps}
                   currentRound={currentRound}
@@ -321,7 +405,7 @@ export function DebateArena() {
 
         {/* Error display */}
         {error && (
-          <div className="absolute bottom-6 left-6 right-6 z-20 p-4 bg-red-900/80 backdrop-blur-md border border-red-700 rounded-xl">
+          <div className="absolute bottom-6 left-6 right-6 z-20 p-4 bg-red-900/80 backdrop-blur-md border border-red-700 rounded-xl safe-area-bottom">
             <p className="text-sm text-red-200">{error}</p>
           </div>
         )}
@@ -329,45 +413,60 @@ export function DebateArena() {
     );
   }
 
-  // 2D View - Traditional layout
+  // 2D View - With particle background
   return (
-    <div className="space-y-6">
-      {/* Header with view toggle */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Debate Arena</h1>
-        <ViewToggle view={ctx.view} onChange={ctx.setView} />
-      </div>
+    <div className="min-h-screen relative">
+      {/* Particle Background (subtle) */}
+      <ParticleBackground particleCount={100} subtle={true} intensity={0.5} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main visualization area */}
-        <div className="lg:col-span-2 space-y-6">
-          <ConsensusVisualization arguments={allArguments} summary={summary} task={ctx.task} />
+      {/* Floating Navigation */}
+      <FloatingNav
+        view={ctx.view}
+        onViewChange={ctx.setView}
+        showViewToggle={true}
+        position="top-left"
+      />
 
-          {/* Timeline */}
+      {/* Main Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pt-20">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-[var(--foreground)]">Debate Arena</h1>
           {status !== "idle" && (
-            <Card>
-              <CardHeader>
-                <h2 className="font-semibold text-gray-900 dark:text-white">Debate Timeline</h2>
-              </CardHeader>
-              <CardContent>
-                <DebateTimeline rounds={rounds} currentRound={currentRound} />
-              </CardContent>
-            </Card>
+            <div className="flex items-center gap-2">
+              <div className="px-3 py-1.5 rounded-full bg-[var(--accent-primary-muted)] text-[var(--accent-primary)] text-sm">
+                Round {currentRound}
+              </div>
+            </div>
           )}
         </div>
 
-        {/* Right sidebar */}
-        <div className="space-y-6">
-          {/* Controls */}
-          {status === "idle" ? (
-            <Card>
-              <CardHeader>
-                <h2 className="font-semibold text-gray-900 dark:text-white">Setup</h2>
-              </CardHeader>
-              <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main visualization area */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="glass rounded-2xl p-6">
+              <ConsensusVisualization arguments={allArguments} summary={summary} task={ctx.task} />
+            </div>
+
+            {/* Timeline */}
+            {status !== "idle" && (
+              <div className="glass rounded-2xl p-6">
+                <h2 className="font-semibold text-[var(--foreground)] mb-4">Debate Timeline</h2>
+                <DebateTimeline rounds={rounds} currentRound={currentRound} />
+              </div>
+            )}
+          </div>
+
+          {/* Right sidebar */}
+          <div className="space-y-6">
+            {/* Controls */}
+            {status === "idle" ? (
+              <div className="glass rounded-2xl p-6 space-y-6">
+                <h2 className="font-semibold text-[var(--foreground)]">Setup</h2>
+
                 {/* Document input */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">
                     Document (Optional)
                   </h3>
                   <DocumentInput onDocumentLoaded={handleDocumentLoaded} />
@@ -378,16 +477,16 @@ export function DebateArena() {
 
                 {/* Agent selection */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Agents</h3>
+                  <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">Select Agents</h3>
                   <div className="flex flex-wrap gap-2">
-                    {config?.agents.map((agent) => (
+                    {allConfigAgents.map((agent) => (
                       <button
                         key={agent.id}
                         onClick={() => handleAgentToggle(agent.id)}
                         className={`px-3 py-1.5 text-sm rounded-full border transition-all ${
                           ctx.selectedAgents.includes(agent.id) || ctx.selectedAgents.length === 0
                             ? "border-transparent text-white"
-                            : "border-gray-300 text-gray-600 bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:bg-gray-800"
+                            : "border-[var(--glass-border)] text-[var(--foreground-muted)] bg-[var(--surface)]"
                         }`}
                         style={{
                           backgroundColor:
@@ -400,7 +499,7 @@ export function DebateArena() {
                       </button>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[var(--foreground-muted)] mt-1">
                     {ctx.selectedAgents.length === 0
                       ? "All agents will participate"
                       : `${ctx.selectedAgents.length} agent(s) selected`}
@@ -408,34 +507,68 @@ export function DebateArena() {
                 </div>
 
                 {/* Start button */}
-                <DebateControls status={status} onStart={handleStart} onReset={handleReset} disabled={!ctx.task.trim()} />
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              {/* Status and controls during debate */}
-              <Card>
-                <CardContent className="py-4">
-                  <DebateControls status={status} onStart={handleStart} onReset={handleReset} />
-                </CardContent>
-              </Card>
+                <button
+                  onClick={handleStart}
+                  disabled={!ctx.task.trim()}
+                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-medium hover:from-cyan-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  Start Debate
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Status and controls during debate */}
+                <div className="glass rounded-2xl p-4">
+                  <div className="flex items-center gap-2">
+                    {(status === "debating" || status === "paused") && (
+                      <>
+                        {status === "debating" ? (
+                          <button
+                            onClick={handlePause}
+                            className="flex-1 px-3 py-2 rounded-lg bg-amber-500/20 text-amber-500 text-sm hover:bg-amber-500/30 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <Pause className="w-4 h-4" />
+                            Pause
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleResume}
+                            className="flex-1 px-3 py-2 rounded-lg bg-green-500/20 text-green-500 text-sm hover:bg-green-500/30 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <Play className="w-4 h-4" />
+                            Resume
+                          </button>
+                        )}
+                      </>
+                    )}
+                    <button
+                      onClick={handleReset}
+                      className="flex-1 px-3 py-2 rounded-lg bg-red-500/20 text-red-500 text-sm hover:bg-red-500/30 transition-colors"
+                    >
+                      End Debate
+                    </button>
+                  </div>
+                </div>
 
-              {/* Moderator panel */}
-              <ModeratorPanel
-                steps={moderatorSteps}
-                currentRound={currentRound}
-                isActive={status === "debating" || status === "concluding"}
-                summary={summary}
-              />
-            </>
-          )}
+                {/* Moderator panel */}
+                <div className="glass rounded-2xl overflow-hidden">
+                  <ModeratorPanel
+                    steps={moderatorSteps}
+                    currentRound={currentRound}
+                    isActive={status === "debating" || status === "concluding"}
+                    summary={summary}
+                  />
+                </div>
+              </>
+            )}
 
-          {/* Error display */}
-          {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-            </div>
-          )}
+            {/* Error display */}
+            {error && (
+              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
+                <p className="text-sm text-red-500">{error}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

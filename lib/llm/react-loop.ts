@@ -11,6 +11,7 @@
 import type { LLMClient, ToolDefinition, ConversationMessage, ToolCall } from "./types";
 import type { ToolContext } from "../tools/types";
 import { toolRegistry } from "../tools/registry";
+import { logLLMCall } from "./logging-service";
 
 export interface ReActStep {
   type: "thinking" | "acting" | "observing";
@@ -33,6 +34,11 @@ export interface ReActConfig {
   tools?: ToolDefinition[];
   toolContext?: ToolContext;
   onStep?: (step: ReActStep) => void;
+  // Logging context
+  debateId?: string;
+  agentId?: string;
+  agentName?: string;
+  purpose?: string;
 }
 
 const DEFAULT_REACT_SYSTEM = `You are an intelligent agent that uses the ReAct (Reasoning and Acting) approach.
@@ -57,6 +63,10 @@ export async function executeReActLoop(
     tools = toolRegistry.getDefinitions(),
     toolContext,
     onStep,
+    debateId,
+    agentId,
+    agentName,
+    purpose,
   } = config;
 
   const steps: ReActStep[] = [];
@@ -71,6 +81,8 @@ export async function executeReActLoop(
   while (iteration < maxIterations) {
     iteration++;
 
+    const callStartTime = Date.now();
+
     // Get LLM response with tools
     const response = await client.completeWithTools({
       systemPrompt,
@@ -79,7 +91,26 @@ export async function executeReActLoop(
       messages: iteration > 1 ? messages : undefined,
     });
 
+    const callDurationMs = Date.now() - callStartTime;
     totalTokens += response.tokensUsed.total;
+
+    // Log this LLM call (fire-and-forget)
+    logLLMCall({
+      provider: client.provider,
+      model: client.model,
+      durationMs: callDurationMs,
+      systemPrompt,
+      userPrompt: iteration === 1 ? userPrompt : `[Continuation - iteration ${iteration}]`,
+      response: response.content,
+      tokensUsed: response.tokensUsed,
+      success: true,
+      purpose: purpose || "react-loop",
+      agentId,
+      agentName,
+      debateId,
+      toolsAvailable: tools.map(t => t.name),
+      toolsCalled: response.toolCalls?.map(tc => tc.name),
+    }).catch(() => {}); // Fire and forget
 
     // If we got text content, add a thinking step
     if (response.content) {
