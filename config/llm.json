@@ -3,7 +3,7 @@
     "claude": {
       "apiKey": "${ANTHROPIC_API_KEY}",
       "defaultModel": "claude-sonnet-4-20250514",
-      "enabled": true
+      "enabled": false
     },
     "openai": {
       "apiKey": "${OPENAI_API_KEY}",
@@ -17,12 +17,12 @@
     },
     "ollama": {
       "endpoint": "http://localhost:11434",
-      "defaultModel": "llama3.2",
-      "enabled": false
+      "defaultModel": "qwen2.5:3b",
+      "enabled": true
     }
   },
   "defaults": {
-    "provider": "claude",
+    "provider": "ollama",
     "temperature": 0.3,
     "maxTokens": 4096
   }

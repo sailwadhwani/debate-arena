@@ -756,6 +756,54 @@ When you have enough information, respond normally without any TOOL_CALL.`;
 // CLIENT FACTORY
 // =============================================================================
 
+import { promises as fs } from "fs";
+import path from "path";
+
+// Cache for LLM config
+let cachedLLMConfig: LLMConfigFile | null = null;
+
+interface LLMConfigFile {
+  providers: {
+    claude: { apiKey?: string; defaultModel: string; enabled: boolean };
+    openai: { apiKey?: string; defaultModel: string; enabled: boolean };
+    gemini: { apiKey?: string; defaultModel: string; enabled: boolean };
+    ollama: { endpoint?: string; defaultModel: string; enabled: boolean };
+  };
+  defaults: {
+    provider: string;
+    temperature: number;
+    maxTokens: number;
+  };
+}
+
+async function loadLLMConfig(): Promise<LLMConfigFile | null> {
+  if (cachedLLMConfig) return cachedLLMConfig;
+
+  try {
+    const configPath = path.join(process.cwd(), "config", "llm.json");
+    const data = await fs.readFile(configPath, "utf-8");
+    cachedLLMConfig = JSON.parse(data);
+    return cachedLLMConfig;
+  } catch {
+    return null;
+  }
+}
+
+// Sync version for constructor use
+function loadLLMConfigSync(): LLMConfigFile | null {
+  if (cachedLLMConfig) return cachedLLMConfig;
+
+  try {
+    const configPath = path.join(process.cwd(), "config", "llm.json");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const data = require("fs").readFileSync(configPath, "utf-8");
+    cachedLLMConfig = JSON.parse(data);
+    return cachedLLMConfig;
+  } catch {
+    return null;
+  }
+}
+
 export function createLLMClient(config: LLMClientConfig): LLMClient {
   switch (config.provider) {
     case "claude":
@@ -771,7 +819,15 @@ export function createLLMClient(config: LLMClientConfig): LLMClient {
   }
 }
 
-export function createLLMClientFromEnv(provider: LLMProvider = "claude", model?: string): LLMClient {
+export function createLLMClientFromEnv(providerOverride?: LLMProvider, modelOverride?: string): LLMClient {
+  // Load config from llm.json
+  const llmConfig = loadLLMConfigSync();
+
+  // Determine provider - use override, or default from config, or fallback to claude
+  const provider: LLMProvider = providerOverride ||
+    (llmConfig?.defaults?.provider as LLMProvider) ||
+    "claude";
+
   const apiKeyEnvMap: Record<LLMProvider, string> = {
     claude: "ANTHROPIC_API_KEY",
     openai: "OPENAI_API_KEY",
@@ -779,7 +835,36 @@ export function createLLMClientFromEnv(provider: LLMProvider = "claude", model?:
     ollama: "",
   };
 
+  // Get API key from env
   const apiKey = apiKeyEnvMap[provider] ? process.env[apiKeyEnvMap[provider]] : undefined;
 
-  return createLLMClient({ provider, apiKey, model });
+  // Get model from override, or provider-specific config, or default
+  let model = modelOverride;
+  let endpoint: string | undefined;
+  let defaultTemperature = llmConfig?.defaults?.temperature;
+  let defaultMaxTokens = llmConfig?.defaults?.maxTokens;
+
+  if (llmConfig?.providers) {
+    const providerConfig = llmConfig.providers[provider];
+    if (providerConfig) {
+      if (!model) {
+        model = providerConfig.defaultModel;
+      }
+      if (provider === "ollama" && "endpoint" in providerConfig) {
+        endpoint = providerConfig.endpoint;
+      }
+    }
+  }
+
+  return createLLMClient({
+    provider,
+    apiKey,
+    model,
+    endpoint,
+    defaultTemperature,
+    defaultMaxTokens,
+  });
 }
+
+// Export for testing
+export { loadLLMConfig };

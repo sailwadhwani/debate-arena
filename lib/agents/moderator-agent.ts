@@ -31,7 +31,8 @@ export class ModeratorAgent {
   constructor(config: ModeratorConfig) {
     this.config = config;
 
-    const provider = config.llm?.provider || "claude";
+    // Create LLM client - use moderator-specific config if provided, otherwise use global defaults
+    const provider = config.llm?.provider;
     const model = config.llm?.model;
     this.client = createLLMClientFromEnv(provider, model);
   }

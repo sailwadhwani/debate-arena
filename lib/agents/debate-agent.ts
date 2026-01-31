@@ -30,8 +30,9 @@ export class DebateAgent {
   constructor(config: AgentConfig) {
     this.config = config;
 
-    // Create LLM client based on agent config or defaults
-    const provider = config.llm?.provider || "claude";
+    // Create LLM client - use agent-specific config if provided, otherwise use global defaults
+    // Pass undefined to let createLLMClientFromEnv use the llm.json defaults
+    const provider = config.llm?.provider;
     const model = config.llm?.model;
     this.client = createLLMClientFromEnv(provider, model);
   }
