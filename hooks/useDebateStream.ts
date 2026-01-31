@@ -84,7 +84,7 @@ export function useDebateStream(): UseDebateStreamResult {
 
       case "round_started":
         setCurrentRound(event.data.round || 1);
-        setModeratorSteps([]);
+        // Don't clear moderator steps - keep history across rounds
         break;
 
       case "agent_thinking":
@@ -118,7 +118,26 @@ export function useDebateStream(): UseDebateStreamResult {
 
       case "moderator_step":
         if (event.data.moderatorStep) {
-          setModeratorSteps((prev) => [...prev, event.data.moderatorStep!]);
+          const stepWithRound = {
+            ...event.data.moderatorStep!,
+            round: event.data.round || currentRound,
+          };
+          setModeratorSteps((prev) => [...prev, stepWithRound]);
+
+          // Also store in round's moderatorSteps
+          setRounds((prev) => {
+            const updated = [...prev];
+            const roundIndex = updated.findIndex(
+              (r) => r.number === (event.data.round || currentRound)
+            );
+            if (roundIndex >= 0) {
+              updated[roundIndex] = {
+                ...updated[roundIndex],
+                moderatorSteps: [...(updated[roundIndex].moderatorSteps || []), stepWithRound],
+              };
+            }
+            return updated;
+          });
         }
         break;
 

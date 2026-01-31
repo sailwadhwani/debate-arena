@@ -118,17 +118,38 @@ export class DebateAgent {
   private buildSystemPrompt(): string {
     return `${this.config.systemPrompt}
 
-IMPORTANT GUIDELINES:
-1. You are participating in a structured debate with other agents
-2. Your perspective is informed by your role as ${this.config.name} with a ${this.config.bias} approach
-3. Use available tools to gather evidence when needed
-4. Be concise but thorough - aim for 2-3 paragraphs
-5. End your response with a score (1-5) and confidence level (0-1)
+You are a world-class thinker participating in an intellectual debate. Channel the clarity of Richard Feynman, the depth of Einstein, and the rigor of a peer-reviewed academic.
+
+DEBATE PRINCIPLES:
+1. FIRST PRINCIPLES THINKING: Break down complex problems to their fundamental truths. Don't accept assumptions - question everything and rebuild from the ground up.
+
+2. ENGAGE WITH OTHER ARGUMENTS: When others have spoken before you:
+   - Directly address their strongest points
+   - Acknowledge where they are RIGHT before critiquing
+   - Point out logical flaws, missing evidence, or unconsidered angles
+   - Build upon good ideas, don't just repeat them
+   - Respectfully challenge weak reasoning
+
+3. DEPTH OVER BREADTH: It's better to explore one insight deeply than many superficially. Explain the "why" behind your reasoning. Use analogies and examples to illuminate complex points.
+
+4. INTELLECTUAL HONESTY:
+   - Acknowledge uncertainty when it exists
+   - Distinguish between facts, inferences, and opinions
+   - Admit the limitations of your perspective
+   - Consider counterarguments to your own position
+
+5. STRUCTURE YOUR ARGUMENT:
+   - Lead with your key insight or thesis
+   - Provide evidence and reasoning
+   - Address potential objections
+   - Conclude with implications and recommendations
+
+Your role: ${this.config.name} with a ${this.config.bias} analytical lens.
 
 RESPONSE FORMAT:
-Provide your argument, then on separate lines at the end:
-SCORE: [1-5]
-CONFIDENCE: [0.0-1.0]`;
+Write a substantive argument (4-6 paragraphs). Then on separate lines at the end:
+SCORE: [1-5] (your assessment of the proposal/document)
+CONFIDENCE: [0.0-1.0] (how confident you are in your analysis)`;
   }
 
   private buildPrompt(
@@ -137,23 +158,43 @@ CONFIDENCE: [0.0-1.0]`;
     round: number,
     previousContext: string
   ): string {
-    let prompt = `TASK: ${task}\n\n`;
+    let prompt = `DEBATE TOPIC: ${task}\n\n`;
 
     if (documentContent) {
-      const truncated = documentContent.length > 4000
-        ? documentContent.substring(0, 4000) + "\n\n[Document truncated...]"
+      const truncated = documentContent.length > 6000
+        ? documentContent.substring(0, 6000) + "\n\n[Document truncated...]"
         : documentContent;
-      prompt += `DOCUMENT CONTENT:\n${truncated}\n\n`;
+      prompt += `DOCUMENT UNDER ANALYSIS:\n${truncated}\n\n`;
     }
 
-    prompt += `DEBATE ROUND: ${round}\n\n`;
+    prompt += `CURRENT ROUND: ${round}\n\n`;
 
     if (previousContext) {
-      prompt += `PREVIOUS ARGUMENTS:\n${previousContext}\n\n`;
+      prompt += `═══════════════════════════════════════════════════════════════
+ARGUMENTS FROM OTHER PARTICIPANTS (you MUST engage with these):
+═══════════════════════════════════════════════════════════════
+${previousContext}
+═══════════════════════════════════════════════════════════════
+
+`;
+      if (round > 1) {
+        prompt += `This is Round ${round}. The debate has evolved. You MUST:
+1. Directly respond to at least one point made by another participant
+2. Either build on their argument, challenge it, or synthesize it with your own view
+3. Bring NEW insights - don't just repeat what's been said
+4. Consider how the collective discussion is evolving
+
+`;
+      } else {
+        prompt += `Other participants have already spoken. You MUST engage with their arguments - agree, disagree, or build upon them. Don't argue in isolation.
+
+`;
+      }
+    } else {
+      prompt += `You are the first to speak in this round. Set a strong foundation with your ${this.config.bias} perspective.\n\n`;
     }
 
-    prompt += `Please provide your analysis and argument from your perspective as ${this.config.name}. `;
-    prompt += `Remember to include your SCORE (1-5) and CONFIDENCE (0-1) at the end.`;
+    prompt += `Now provide your substantive argument. Think deeply. Be specific. Engage with others. End with your SCORE and CONFIDENCE.`;
 
     return prompt;
   }

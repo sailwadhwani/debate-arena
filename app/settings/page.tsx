@@ -53,7 +53,7 @@ const PROVIDER_INFO = {
   ollama: {
     name: "Ollama (Local)",
     envVar: null,
-    models: ["llama3.2", "llama3.1", "mistral", "codellama", "mixtral"],
+    models: ["qwen2.5:3b", "llama3.2", "llama3.1", "mistral", "codellama", "mixtral"],
     hasEndpoint: true,
     color: "#8B5CF6",
   },
