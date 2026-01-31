@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { DebateProvider } from "@/contexts/DebateContext";
 
 export const metadata: Metadata = {
   title: "Debate Arena - Multi-Agent AI Debate Platform",
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-screen">
-        {children}
+        <DebateProvider>{children}</DebateProvider>
       </body>
     </html>
   );

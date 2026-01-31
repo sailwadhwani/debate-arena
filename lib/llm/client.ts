@@ -635,29 +635,49 @@ export class OllamaClient implements LLMClient {
       options: { temperature, num_predict: maxTokens, stop: request.stopSequences },
     };
 
-    const response = await fetch(`${this.baseUrl}/api/generate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    console.log(`[Ollama] Calling ${this.baseUrl}/api/generate with model: ${this.model}`);
+    const startTime = Date.now();
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Ollama API error: ${response.status} - ${error}`);
+    // Add timeout controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+
+    try {
+      const response = await fetch(`${this.baseUrl}/api/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Ollama API error: ${response.status} - ${error}`);
+      }
+
+      const data = await response.json();
+      const elapsed = Date.now() - startTime;
+      console.log(`[Ollama] Response received in ${elapsed}ms`);
+
+      return {
+        content: data.response || "",
+        tokensUsed: {
+          input: data.prompt_eval_count || 0,
+          output: data.eval_count || 0,
+          total: (data.prompt_eval_count || 0) + (data.eval_count || 0),
+        },
+        model: this.model,
+        finishReason: data.done ? "stop" : "max_tokens",
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(`Ollama request timed out after 2 minutes. Is Ollama running? Try: ollama serve`);
+      }
+      throw error;
     }
-
-    const data = await response.json();
-
-    return {
-      content: data.response || "",
-      tokensUsed: {
-        input: data.prompt_eval_count || 0,
-        output: data.eval_count || 0,
-        total: (data.prompt_eval_count || 0) + (data.eval_count || 0),
-      },
-      model: this.model,
-      finishReason: data.done ? "stop" : "max_tokens",
-    };
   }
 
   async completeWithTools(request: LLMToolRequest): Promise<LLMToolResponse> {

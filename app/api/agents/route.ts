@@ -11,8 +11,9 @@ import {
   addAgent,
   updateAgent,
   deleteAgent,
+  updateModerator,
 } from "@/lib/config/loader";
-import type { AgentConfig } from "@/lib/agents/types";
+import type { AgentConfig, ModeratorConfig } from "@/lib/agents/types";
 
 export async function GET() {
   try {
@@ -82,6 +83,18 @@ export async function PUT(request: NextRequest) {
         }
         await saveAgentsConfig(config);
         return NextResponse.json({ success: true });
+      }
+
+      case "updateModerator": {
+        const { moderator } = body;
+        if (!moderator) {
+          return NextResponse.json(
+            { error: "Moderator config required" },
+            { status: 400 }
+          );
+        }
+        const updated = await updateModerator(moderator as ModeratorConfig);
+        return NextResponse.json({ success: true, moderator: updated });
       }
 
       default:

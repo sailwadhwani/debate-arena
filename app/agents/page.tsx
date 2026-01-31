@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Trash2, Save, Shield, Briefcase, Package, Cpu, User, Bot } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, Shield, Briefcase, Package, Cpu, User, Bot, Settings } from "lucide-react";
 import { useAgentConfig } from "@/hooks/useAgentConfig";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import type { AgentConfig, AvatarType, AgentRole, AgentBias } from "@/lib/agents/types";
+import type { AgentConfig, AvatarType, AgentRole, AgentBias, ModeratorConfig } from "@/lib/agents/types";
 
 const AVATAR_ICONS: Record<AvatarType, React.ComponentType<{ className?: string }>> = {
   shield: Shield,
@@ -38,9 +38,38 @@ const AVATARS: AvatarType[] = ["shield", "briefcase", "package", "cpu", "user", 
 const TOOLS = ["web_search", "calculator", "query_document"];
 
 export default function AgentsPage() {
-  const { config, loading, error, updateAgent, addAgent, deleteAgent } = useAgentConfig();
+  const { config, loading, error, updateAgent, addAgent, deleteAgent, refetch } = useAgentConfig();
   const [editingAgent, setEditingAgent] = useState<AgentConfig | null>(null);
   const [isNew, setIsNew] = useState(false);
+  const [moderator, setModerator] = useState<ModeratorConfig | null>(null);
+  const [moderatorDirty, setModeratorDirty] = useState(false);
+  const [savingModerator, setSavingModerator] = useState(false);
+
+  // Sync moderator from config
+  useEffect(() => {
+    if (config?.moderator) {
+      setModerator(config.moderator);
+    }
+  }, [config?.moderator]);
+
+  const handleSaveModerator = async () => {
+    if (!moderator) return;
+    setSavingModerator(true);
+    try {
+      const response = await fetch("/api/agents", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "updateModerator", moderator }),
+      });
+      if (!response.ok) throw new Error("Failed to save moderator");
+      setModeratorDirty(false);
+      await refetch();
+    } catch (e) {
+      console.error("Failed to save moderator:", e);
+    } finally {
+      setSavingModerator(false);
+    }
+  };
 
   const handleEdit = (agent: AgentConfig) => {
     setEditingAgent({ ...agent });
@@ -201,6 +230,78 @@ export default function AgentsPage() {
             );
           })}
         </div>
+
+        {/* Moderator Settings */}
+        {moderator && (
+          <div className="mt-10">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              Moderator Settings
+            </h2>
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Moderator Name
+                  </label>
+                  <input
+                    type="text"
+                    value={moderator.name}
+                    onChange={(e) => {
+                      setModerator({ ...moderator, name: e.target.value });
+                      setModeratorDirty(true);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Moderator System Prompt
+                    <span className="text-gray-500 font-normal ml-2">
+                      (Include DECISION: CONTINUE/CONCLUDE format instruction)
+                    </span>
+                  </label>
+                  <textarea
+                    value={moderator.systemPrompt}
+                    onChange={(e) => {
+                      setModerator({ ...moderator, systemPrompt: e.target.value });
+                      setModeratorDirty(true);
+                    }}
+                    rows={8}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 resize-none font-mono text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Maximum Rounds
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={moderator.maxRounds}
+                    onChange={(e) => {
+                      setModerator({ ...moderator, maxRounds: parseInt(e.target.value) || 5 });
+                      setModeratorDirty(true);
+                    }}
+                    className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
+                  />
+                </div>
+
+                {moderatorDirty && (
+                  <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <Button onClick={handleSaveModerator} disabled={savingModerator}>
+                      <Save className="w-4 h-4 mr-2" />
+                      {savingModerator ? "Saving..." : "Save Moderator Settings"}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Edit Modal */}
         {editingAgent && (

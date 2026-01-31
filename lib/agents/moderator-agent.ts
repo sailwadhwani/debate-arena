@@ -129,17 +129,9 @@ export class ModeratorAgent {
   }
 
   private buildSystemPrompt(): string {
-    return `${this.config.systemPrompt}
-
-As the moderator, you must:
-1. Use your tools to evaluate the debate's progress
-2. Identify areas of agreement and disagreement
-3. Decide whether the debate should continue or conclude
-
-DECISION FORMAT:
-After your analysis, state your decision clearly:
-DECISION: CONTINUE or CONCLUDE
-REASONING: [Your explanation]`;
+    // Use only the configured system prompt - no hidden instructions
+    // The prompt should include instructions for DECISION: CONTINUE/CONCLUDE format
+    return this.config.systemPrompt;
   }
 
   private buildEvaluationPrompt(

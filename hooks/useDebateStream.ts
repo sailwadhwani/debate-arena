@@ -15,6 +15,7 @@ interface UseDebateStreamResult {
   rounds: DebateState["rounds"];
   currentRound: number;
   speakingAgent: string | undefined;
+  thinkingAgent: string | undefined;
   arguments: DebateArgument[];
   moderatorSteps: ModeratorStep[];
   summary: DebateSummary | undefined;
@@ -28,6 +29,7 @@ export function useDebateStream(): UseDebateStreamResult {
   const [rounds, setRounds] = useState<DebateState["rounds"]>([]);
   const [currentRound, setCurrentRound] = useState(0);
   const [speakingAgent, setSpeakingAgent] = useState<string | undefined>();
+  const [thinkingAgent, setThinkingAgent] = useState<string | undefined>();
   const [moderatorSteps, setModeratorSteps] = useState<ModeratorStep[]>([]);
   const [summary, setSummary] = useState<DebateSummary | undefined>();
   const [error, setError] = useState<string | undefined>();
@@ -44,6 +46,7 @@ export function useDebateStream(): UseDebateStreamResult {
     setRounds([]);
     setCurrentRound(0);
     setSpeakingAgent(undefined);
+    setThinkingAgent(undefined);
     setModeratorSteps([]);
     setSummary(undefined);
     setError(undefined);
@@ -88,12 +91,13 @@ export function useDebateStream(): UseDebateStreamResult {
         break;
 
       case "agent_thinking":
-        setSpeakingAgent(event.data.agentId);
+        setThinkingAgent(event.data.agentId);
         break;
 
       case "agent_argument":
-        setSpeakingAgent(undefined);
+        setThinkingAgent(undefined);
         if (event.data.argument) {
+          setSpeakingAgent(event.data.argument.agentId);
           setRounds((prev) => {
             const updated = [...prev];
             const roundIndex = updated.findIndex(
@@ -159,17 +163,23 @@ export function useDebateStream(): UseDebateStreamResult {
         if (event.data.decision === "continue") {
           const nextRound = (event.data.round || 0) + 1;
           setCurrentRound(nextRound);
+          setSpeakingAgent(undefined);
+          setThinkingAgent(undefined);
           setRounds((prev) => [
             ...prev,
             { number: nextRound, arguments: [], moderatorSteps: [] },
           ]);
         } else {
           setStatus("concluding");
+          setSpeakingAgent(undefined);
+          setThinkingAgent(undefined);
         }
         break;
 
       case "debate_complete":
         setStatus("complete");
+        setSpeakingAgent(undefined);
+        setThinkingAgent(undefined);
         if (event.data.summary) {
           setSummary(event.data.summary);
         }
@@ -199,6 +209,7 @@ export function useDebateStream(): UseDebateStreamResult {
     rounds,
     currentRound,
     speakingAgent,
+    thinkingAgent,
     arguments: allArguments,
     moderatorSteps,
     summary,
