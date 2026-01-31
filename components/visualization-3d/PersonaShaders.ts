@@ -1,79 +1,207 @@
 /**
- * GLSL Shaders for Persona 3D Visualization
+ * Advanced cyberpunk shaders for humanoid visualization
+ * Creates glowing teal/cyan mesh effect like the reference images
  */
 
-export const humanoidVertexShader = /* glsl */ `
-  uniform float time;
-  uniform float speakingIntensity;
+// Vertex shader for the holographic humanoid effect
+export const humanoidVertexShader = `
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+  varying vec2 vUv;
+  varying float vFresnel;
 
-  varying vec3 vPos;
-  varying float vPulse;
+  uniform float time;
+  uniform float pulseIntensity;
 
   void main() {
-    vec3 pos = position;
+    vUv = uv;
+    vNormal = normalize(normalMatrix * normal);
+    vPosition = position;
 
-    // Add speaking animation - subtle scale and displacement
-    float speakPulse = sin(time * 8.0) * 0.02 * speakingIntensity;
-    pos *= 1.0 + speakPulse;
+    // Calculate view direction for fresnel
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vec3 viewDirection = normalize(cameraPosition - worldPosition.xyz);
+    vFresnel = 1.0 - max(dot(viewDirection, vNormal), 0.0);
 
-    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-    gl_Position = projectionMatrix * mvPosition;
+    // Subtle vertex displacement for organic feel
+    vec3 displaced = position;
+    float displacement = sin(position.y * 10.0 + time * 2.0) * 0.002 * pulseIntensity;
+    displaced += normal * displacement;
 
-    vPos = pos;
-
-    // The "Data Pulse" calculated for the fragment shader
-    vPulse = sin(pos.y * 4.0 - time * 4.0) * 0.5 + 0.5;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
   }
 `;
 
-export const humanoidFragmentShader = /* glsl */ `
-  varying vec3 vPos;
-  varying float vPulse;
-
+// Fragment shader for the glowing holographic effect
+export const humanoidFragmentShader = `
+  uniform vec3 baseColor;
+  uniform vec3 glowColor;
   uniform float time;
-  uniform vec3 colorPrimary;
-  uniform vec3 colorSecondary;
+  uniform float opacity;
   uniform float speakingIntensity;
+  uniform float gridDensity;
+
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+  varying vec2 vUv;
+  varying float vFresnel;
+
+  // Noise function for texture
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+  }
+
+  float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(
+      mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
+      f.y
+    );
+  }
 
   void main() {
-    // Vertical Gradient
-    float heightPct = smoothstep(-2.0, 2.0, vPos.y);
-    vec3 baseColor = mix(colorSecondary, colorPrimary, heightPct);
+    // Create grid/mesh pattern
+    float gridX = abs(sin(vUv.x * gridDensity * 3.14159));
+    float gridY = abs(sin(vUv.y * gridDensity * 3.14159));
+    float grid = max(gridX, gridY);
+    grid = smoothstep(0.8, 1.0, grid);
 
-    // The Pulse Line (Bright flash moving through)
-    float wave = smoothstep(0.95, 1.0, vPulse);
+    // Scan lines effect
+    float scanline = sin(vPosition.y * 50.0 + time * 3.0) * 0.5 + 0.5;
+    scanline = smoothstep(0.3, 0.7, scanline) * 0.15;
 
-    // Speaking glow effect
-    float speakGlow = speakingIntensity * (0.5 + 0.5 * sin(time * 10.0));
+    // Edge glow using fresnel
+    float edgeGlow = pow(vFresnel, 2.0) * 1.5;
 
-    // Combine: Base Neon + White Hot Pulse + Speaking Glow
-    vec3 finalColor = baseColor + vec3(1.0) * wave + colorPrimary * speakGlow * 0.3;
+    // Data flow effect
+    float dataFlow = noise(vec2(vUv.x * 20.0, vUv.y * 20.0 - time * 0.5));
+    dataFlow = smoothstep(0.4, 0.6, dataFlow) * 0.3;
 
-    // Opacity logic for wireframe feel
-    float alpha = 0.6 + wave * 0.4 + speakGlow * 0.2;
+    // Combine effects
+    float intensity = grid * 0.3 + edgeGlow + scanline + dataFlow;
+    intensity *= (0.7 + speakingIntensity * 0.5);
+
+    // Color mixing
+    vec3 color = mix(baseColor, glowColor, edgeGlow + speakingIntensity * 0.3);
+    color += glowColor * scanline;
+    color += glowColor * dataFlow * 0.5;
+
+    // Pulsing core glow
+    float corePulse = sin(time * 2.0) * 0.1 + 0.9;
+    color *= corePulse;
+
+    // Final color with alpha
+    float alpha = opacity * (0.3 + intensity * 0.7);
+    alpha = min(alpha, 1.0);
+
+    gl_FragColor = vec4(color, alpha);
+  }
+`;
+
+// Shader for floating orbs
+export const orbVertexShader = `
+  varying vec3 vNormal;
+  varying vec3 vViewPosition;
+
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewPosition = -mvPosition.xyz;
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+export const orbFragmentShader = `
+  uniform vec3 color;
+  uniform float time;
+  uniform float intensity;
+
+  varying vec3 vNormal;
+  varying vec3 vViewPosition;
+
+  void main() {
+    vec3 viewDir = normalize(vViewPosition);
+    float fresnel = pow(1.0 - max(dot(viewDir, vNormal), 0.0), 2.0);
+
+    // Pulsing glow
+    float pulse = sin(time * 3.0) * 0.2 + 0.8;
+
+    vec3 finalColor = color * (fresnel * 2.0 + 0.3) * pulse * intensity;
+    float alpha = fresnel * 0.8 + 0.4;
 
     gl_FragColor = vec4(finalColor, alpha);
   }
 `;
 
-/**
- * Parse hex color to RGB array [0-1]
- */
-export function hexToRgb(hex: string): [number, number, number] {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return [0, 0, 0];
-  return [
-    parseInt(result[1], 16) / 255,
-    parseInt(result[2], 16) / 255,
-    parseInt(result[3], 16) / 255,
-  ];
-}
+// Star field shader
+export const starVertexShader = `
+  attribute float size;
+  attribute float brightness;
 
-/**
- * Darken a hex color
- */
-export function darkenColor(hex: string, factor: number = 0.5): string {
-  const rgb = hexToRgb(hex);
-  const darkened = rgb.map((c) => Math.round(c * factor * 255));
-  return `#${darkened.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
-}
+  varying float vBrightness;
+
+  uniform float time;
+
+  void main() {
+    vBrightness = brightness;
+
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+    // Twinkle effect
+    float twinkle = sin(time * 2.0 + position.x * 100.0) * 0.3 + 0.7;
+
+    gl_PointSize = size * twinkle * (300.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+export const starFragmentShader = `
+  varying float vBrightness;
+
+  uniform vec3 color;
+
+  void main() {
+    // Circular point with soft edges
+    vec2 center = gl_PointCoord - vec2(0.5);
+    float dist = length(center);
+    float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
+
+    vec3 finalColor = color * vBrightness;
+
+    gl_FragColor = vec4(finalColor, alpha * vBrightness);
+  }
+`;
+
+// Wireframe overlay shader for the mesh lines
+export const wireframeVertexShader = `
+  varying vec3 vPosition;
+  varying vec3 vNormal;
+
+  void main() {
+    vPosition = position;
+    vNormal = normalize(normalMatrix * normal);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+export const wireframeFragmentShader = `
+  uniform vec3 color;
+  uniform float opacity;
+  uniform float time;
+
+  varying vec3 vPosition;
+  varying vec3 vNormal;
+
+  void main() {
+    // Animated lines traveling down
+    float line = sin(vPosition.y * 30.0 - time * 2.0);
+    line = smoothstep(0.95, 1.0, line);
+
+    float alpha = opacity * (0.3 + line * 0.7);
+
+    gl_FragColor = vec4(color, alpha);
+  }
+`;

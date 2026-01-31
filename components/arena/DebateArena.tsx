@@ -40,13 +40,12 @@ export function DebateArena() {
       .map((a) => ({ id: a.id, name: a.name, color: a.color }));
   }, [config, selectedAgents]);
 
-  // Get current speaking agent's speech content
-  const speechContent = useMemo(() => {
+  // Get current speaking agent's argument
+  const currentArgument = useMemo(() => {
     if (!debateStream.speakingAgent) return undefined;
-    const latest = debateStream.arguments
+    return debateStream.arguments
       .filter((a) => a.agentId === debateStream.speakingAgent)
       .pop();
-    return latest?.content;
   }, [debateStream.speakingAgent, debateStream.arguments]);
 
   const handleDocumentLoaded = useCallback((content: string, name: string) => {
@@ -122,12 +121,14 @@ export function DebateArena() {
         <div className="lg:col-span-2 space-y-6">
           {/* Visualization */}
           {view === "3d" ? (
-            <DebateScene
-              agents={agents}
-              speakingAgentId={debateStream.speakingAgent}
-              speechContent={speechContent}
-              height={400}
-            />
+            <div className="h-[500px] relative">
+              <DebateScene
+                agents={agents}
+                speakingAgentId={debateStream.speakingAgent}
+                currentArgument={currentArgument}
+                arguments={debateStream.arguments}
+              />
+            </div>
           ) : (
             <ConsensusVisualization
               arguments={debateStream.arguments}

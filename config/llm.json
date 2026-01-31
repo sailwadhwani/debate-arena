@@ -1,23 +1,24 @@
 {
   "providers": {
     "claude": {
-      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "apiKey": "${ANTHROPIC_API_KEY}",
       "defaultModel": "claude-sonnet-4-20250514",
-      "endpoint": "https://api.anthropic.com/v1/messages"
+      "enabled": true
     },
     "openai": {
-      "apiKeyEnv": "OPENAI_API_KEY",
+      "apiKey": "${OPENAI_API_KEY}",
       "defaultModel": "gpt-4-turbo",
-      "endpoint": "https://api.openai.com/v1/chat/completions"
+      "enabled": false
     },
     "gemini": {
-      "apiKeyEnv": "GOOGLE_AI_API_KEY",
+      "apiKey": "${GOOGLE_AI_API_KEY}",
       "defaultModel": "gemini-2.5-flash",
-      "endpoint": "https://generativelanguage.googleapis.com/v1beta"
+      "enabled": false
     },
     "ollama": {
       "endpoint": "http://localhost:11434",
-      "defaultModel": "llama2"
+      "defaultModel": "llama3.2",
+      "enabled": false
     }
   },
   "defaults": {

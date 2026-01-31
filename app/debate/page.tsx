@@ -1,6 +1,6 @@
 import { DebateArena } from "@/components/arena/DebateArena";
 import Link from "next/link";
-import { Settings } from "lucide-react";
+import { Settings, Users, Sliders } from "lucide-react";
 
 export default function DebatePage() {
   return (
@@ -10,7 +10,7 @@ export default function DebatePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center">
                 <span className="text-white font-bold text-sm">DA</span>
               </div>
               <span className="font-semibold text-gray-900 dark:text-white">
@@ -18,13 +18,20 @@ export default function DebatePage() {
               </span>
             </div>
 
-            <nav className="flex items-center gap-4">
+            <nav className="flex items-center gap-6">
               <Link
                 href="/agents"
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
               >
-                <Settings className="w-4 h-4" />
-                Configure Agents
+                <Users className="w-4 h-4" />
+                Agents
+              </Link>
+              <Link
+                href="/settings"
+                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+              >
+                <Sliders className="w-4 h-4" />
+                LLM Settings
               </Link>
             </nav>
           </div>

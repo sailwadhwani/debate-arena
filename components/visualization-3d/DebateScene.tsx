@@ -1,264 +1,158 @@
 "use client";
 
-import { Suspense, useRef, useEffect, useState, useCallback } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import * as THREE from "three";
+import { Suspense, useMemo } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { PersonaMesh } from "./PersonaMesh";
 import { SpeechBubble } from "./SpeechBubble";
+import { StarField, DustParticles } from "./StarField";
+import type { DebateArgument } from "@/lib/agents/types";
 
-interface AgentInfo {
+interface Agent {
   id: string;
   name: string;
   color: string;
 }
 
-export interface DebateSceneProps {
-  agents: AgentInfo[];
-  speakingAgentId?: string | null;
-  speechContent?: string;
-  height?: number;
+interface DebateSceneProps {
+  agents: Agent[];
+  speakingAgentId?: string;
+  currentArgument?: DebateArgument;
+  arguments?: DebateArgument[];
 }
 
-interface ScreenPosition {
-  x: number;
-  y: number;
-  visible: boolean;
+// Calculate positions for agents in a semi-circle
+function getAgentPosition(index: number, total: number): [number, number, number] {
+  if (total === 1) return [0, 0, 0];
+
+  // Arrange in a semi-circle facing the camera
+  const angleSpread = Math.PI * 0.6; // 108 degrees spread
+  const startAngle = -angleSpread / 2;
+  const angle = startAngle + (index / (total - 1)) * angleSpread;
+
+  const radius = total > 3 ? 1.5 : 1.2;
+  const x = Math.sin(angle) * radius;
+  const z = Math.cos(angle) * radius * 0.3;
+  const y = 0;
+
+  return [x, y, z];
 }
 
-type ScreenPositions = Record<string, ScreenPosition>;
+function Scene({ agents, speakingAgentId, currentArgument }: DebateSceneProps) {
+  const agentPositions = useMemo(
+    () => agents.map((_, i) => getAgentPosition(i, agents.length)),
+    [agents.length]
+  );
 
-/**
- * Calculate positions for agents in a semi-circle
- */
-function getAgentPositions(count: number): [number, number, number][] {
-  if (count === 0) return [];
+  // Get the speaking agent's info
+  const speakingAgent = agents.find((a) => a.id === speakingAgentId);
+  const speakingIndex = agents.findIndex((a) => a.id === speakingAgentId);
+  const speakingPosition = speakingIndex >= 0 ? agentPositions[speakingIndex] : null;
 
-  const positions: [number, number, number][] = [];
-  const radius = 12;
-  const startAngle = -Math.PI / 3;
-  const endAngle = Math.PI / 3;
-
-  for (let i = 0; i < count; i++) {
-    const angle = count === 1
-      ? 0
-      : startAngle + (endAngle - startAngle) * (i / (count - 1));
-    positions.push([
-      Math.sin(angle) * radius,
-      0,
-      -Math.cos(angle) * radius + 5,
-    ]);
-  }
-
-  return positions;
-}
-
-function PositionTracker({
-  agents,
-  positions,
-  onPositionsUpdate,
-}: {
-  agents: AgentInfo[];
-  positions: [number, number, number][];
-  onPositionsUpdate: (positions: ScreenPositions) => void;
-}) {
-  const { camera, size } = useThree();
-
-  useFrame(() => {
-    const screenPositions: ScreenPositions = {};
-
-    agents.forEach((agent, i) => {
-      const pos = positions[i];
-      if (!pos) return;
-
-      // Get head position (add 2.8 to Y for top of head)
-      const headPos = new THREE.Vector3(pos[0], pos[1] + 2.8, pos[2]);
-      headPos.project(camera);
-
-      const x = (headPos.x * 0.5 + 0.5) * size.width;
-      const y = (-headPos.y * 0.5 + 0.5) * size.height;
-
-      screenPositions[agent.id] = {
-        x,
-        y,
-        visible: headPos.z < 1,
-      };
-    });
-
-    onPositionsUpdate(screenPositions);
-  });
-
-  return null;
-}
-
-function Scene({
-  agents,
-  speakingAgentId,
-  positions,
-  onPositionsUpdate,
-}: {
-  agents: AgentInfo[];
-  speakingAgentId?: string | null;
-  positions: [number, number, number][];
-  onPositionsUpdate: (positions: ScreenPositions) => void;
-}) {
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 4, 25]} fov={45} />
+      {/* Lighting */}
+      <ambientLight intensity={0.1} />
+      <pointLight position={[0, 5, 5]} intensity={0.3} color="#00ffcc" />
+      <pointLight position={[-3, 2, -2]} intensity={0.2} color="#0088ff" />
+      <pointLight position={[3, 2, -2]} intensity={0.2} color="#00ff88" />
 
-      <OrbitControls
-        enableDamping
-        dampingFactor={0.05}
-        autoRotate={!speakingAgentId}
-        autoRotateSpeed={0.5}
-        minDistance={10}
-        maxDistance={50}
-        maxPolarAngle={Math.PI / 2}
-      />
+      {/* Star field background */}
+      <StarField count={400} radius={15} color="#4488aa" />
+      <DustParticles count={80} color="#00ffcc" />
 
-      <ambientLight intensity={0.3} />
-      <pointLight position={[10, 10, 10]} intensity={0.5} />
-      <pointLight position={[-10, 10, -10]} intensity={0.3} color="#00f3ff" />
-      <pointLight position={[0, -10, 0]} intensity={0.2} color="#ff0055" />
-
-      <fog attach="fog" args={["#050508", 15, 60]} />
-
-      <PositionTracker
-        agents={agents}
-        positions={positions}
-        onPositionsUpdate={onPositionsUpdate}
-      />
-
-      {agents.map((agent, i) => (
+      {/* Persona meshes for each agent */}
+      {agents.map((agent, index) => (
         <PersonaMesh
           key={agent.id}
-          agentId={agent.id}
+          position={agentPositions[index]}
           color={agent.color}
-          position={positions[i] || [0, 0, 0]}
-          isSpeaking={speakingAgentId === agent.id}
+          isSpeaking={agent.id === speakingAgentId}
+          speakingIntensity={agent.id === speakingAgentId ? 0.8 : 0}
         />
       ))}
 
+      {/* Speech bubble for current speaker */}
+      {speakingAgent && speakingPosition && currentArgument && (
+        <SpeechBubble
+          position={[speakingPosition[0], speakingPosition[1] + 0.7, speakingPosition[2]]}
+          text={currentArgument.content.substring(0, 150) + (currentArgument.content.length > 150 ? "..." : "")}
+          agentName={speakingAgent.name}
+          color={speakingAgent.color}
+        />
+      )}
+
+      {/* Camera controls */}
+      <OrbitControls
+        enablePan={false}
+        enableZoom={true}
+        minDistance={1.5}
+        maxDistance={6}
+        minPolarAngle={Math.PI * 0.3}
+        maxPolarAngle={Math.PI * 0.65}
+        autoRotate={!speakingAgentId}
+        autoRotateSpeed={0.3}
+      />
+
+      {/* Post-processing effects */}
       <EffectComposer>
         <Bloom
+          intensity={1.5}
           luminanceThreshold={0.1}
           luminanceSmoothing={0.9}
-          intensity={1.2}
-          radius={0.5}
+          mipmapBlur
         />
+        <Vignette eskil={false} offset={0.1} darkness={0.8} />
       </EffectComposer>
     </>
   );
 }
 
-function LoadingFallback() {
+export function DebateScene(props: DebateSceneProps) {
   return (
-    <mesh>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshBasicMaterial color="#333" wireframe />
-    </mesh>
-  );
-}
-
-function AgentLabel({
-  agent,
-  isSpeaking,
-}: {
-  agent: AgentInfo;
-  isSpeaking: boolean;
-}) {
-  return (
-    <div
-      className="text-center transition-all duration-300"
-      style={{
-        opacity: isSpeaking ? 1 : 0.7,
-        transform: isSpeaking ? "scale(1.1)" : "scale(1)",
-      }}
-    >
-      <div
-        className="text-xs font-bold uppercase tracking-widest"
-        style={{
-          fontFamily: "'Orbitron', monospace",
-          background: `linear-gradient(90deg, #fff, ${agent.color})`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          textShadow: isSpeaking ? `0 0 10px ${agent.color}` : "none",
-        }}
-      >
-        {agent.name}
-      </div>
-    </div>
-  );
-}
-
-export function DebateScene({
-  agents,
-  speakingAgentId,
-  speechContent,
-  height = 400,
-}: DebateSceneProps) {
-  const [screenPositions, setScreenPositions] = useState<ScreenPositions>({});
-  const positionsRef = useRef<ScreenPositions>({});
-
-  const positions = getAgentPositions(agents.length);
-
-  const handlePositionsUpdate = useCallback((positions: ScreenPositions) => {
-    positionsRef.current = positions;
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setScreenPositions({ ...positionsRef.current });
-    }, 16);
-    return () => clearInterval(interval);
-  }, []);
-
-  const speakingAgent = agents.find((a) => a.id === speakingAgentId);
-
-  return (
-    <div
-      className="relative w-full rounded-xl overflow-hidden"
-      style={{ height, background: "#050508" }}
-    >
+    <div className="w-full h-full bg-[#0a0f14] rounded-xl overflow-hidden">
       <Canvas
+        camera={{ position: [0, 0.3, 2.5], fov: 50 }}
         gl={{
           antialias: true,
-          alpha: true,
+          alpha: false,
           powerPreference: "high-performance",
         }}
         dpr={[1, 2]}
       >
-        <Suspense fallback={<LoadingFallback />}>
-          <Scene
-            agents={agents}
-            speakingAgentId={speakingAgentId}
-            positions={positions}
-            onPositionsUpdate={handlePositionsUpdate}
-          />
+        <color attach="background" args={["#0a0f14"]} />
+        <fog attach="fog" args={["#0a0f14", 5, 15]} />
+        <Suspense fallback={null}>
+          <Scene {...props} />
         </Suspense>
       </Canvas>
 
-      {/* Speech bubble overlay */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {speakingAgent && speechContent && screenPositions[speakingAgent.id] && (
-          <SpeechBubble
-            agentName={speakingAgent.name}
-            content={speechContent}
-            color={speakingAgent.color}
-            position={screenPositions[speakingAgent.id]}
-          />
-        )}
-      </div>
-
-      {/* Agent labels */}
-      <div className="absolute bottom-0 left-0 right-0 flex justify-around px-8 pb-4 pointer-events-none">
-        {agents.map((agent) => (
-          <AgentLabel
+      {/* Agent labels overlay */}
+      <div className="absolute bottom-4 left-4 right-4 flex justify-center gap-4">
+        {props.agents.map((agent) => (
+          <div
             key={agent.id}
-            agent={agent}
-            isSpeaking={speakingAgentId === agent.id}
-          />
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 ${
+              agent.id === props.speakingAgentId
+                ? "ring-2 ring-offset-2 ring-offset-gray-900"
+                : "opacity-60"
+            }`}
+            style={{
+              backgroundColor: `${agent.color}20`,
+              color: agent.color,
+              borderColor: agent.color,
+              boxShadow: agent.id === props.speakingAgentId ? `0 0 20px ${agent.color}40` : "none",
+            }}
+          >
+            <span
+              className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                agent.id === props.speakingAgentId ? "animate-pulse" : ""
+              }`}
+              style={{ backgroundColor: agent.color }}
+            />
+            {agent.name}
+          </div>
         ))}
       </div>
     </div>
