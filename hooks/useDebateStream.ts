@@ -10,12 +10,18 @@ import type {
   DebateStatus,
 } from "@/lib/agents/types";
 
+interface CurrentTool {
+  name: string;
+  input?: Record<string, unknown>;
+}
+
 interface UseDebateStreamResult {
   status: DebateStatus;
   rounds: DebateState["rounds"];
   currentRound: number;
   speakingAgent: string | undefined;
   thinkingAgent: string | undefined;
+  currentTool: CurrentTool | undefined;
   arguments: DebateArgument[];
   moderatorSteps: ModeratorStep[];
   summary: DebateSummary | undefined;
@@ -33,6 +39,7 @@ export function useDebateStream(): UseDebateStreamResult {
   const [currentRound, setCurrentRound] = useState(0);
   const [speakingAgent, setSpeakingAgent] = useState<string | undefined>();
   const [thinkingAgent, setThinkingAgent] = useState<string | undefined>();
+  const [currentTool, setCurrentTool] = useState<CurrentTool | undefined>();
   const [moderatorSteps, setModeratorSteps] = useState<ModeratorStep[]>([]);
   const [summary, setSummary] = useState<DebateSummary | undefined>();
   const [error, setError] = useState<string | undefined>();
@@ -53,6 +60,7 @@ export function useDebateStream(): UseDebateStreamResult {
     setCurrentRound(0);
     setSpeakingAgent(undefined);
     setThinkingAgent(undefined);
+    setCurrentTool(undefined);
     setModeratorSteps([]);
     setSummary(undefined);
     setError(undefined);
@@ -89,6 +97,7 @@ export function useDebateStream(): UseDebateStreamResult {
     setCurrentRound(0);
     setSpeakingAgent(undefined);
     setThinkingAgent(undefined);
+    setCurrentTool(undefined);
     setModeratorSteps([]);
     setSummary(undefined);
     setError(undefined);
@@ -159,10 +168,19 @@ export function useDebateStream(): UseDebateStreamResult {
 
       case "agent_thinking":
         setThinkingAgent(event.data.agentId);
+        setCurrentTool(undefined); // Clear any previous tool
+        break;
+
+      case "agent_tool_use":
+        setCurrentTool({
+          name: event.data.toolName as string,
+          input: event.data.toolInput as Record<string, unknown> | undefined,
+        });
         break;
 
       case "agent_argument":
         setThinkingAgent(undefined);
+        setCurrentTool(undefined);
         if (event.data.argument) {
           setSpeakingAgent(event.data.argument.agentId);
           setRounds((prev) => {
@@ -288,6 +306,7 @@ export function useDebateStream(): UseDebateStreamResult {
     currentRound,
     speakingAgent,
     thinkingAgent,
+    currentTool,
     arguments: allArguments,
     moderatorSteps,
     summary,

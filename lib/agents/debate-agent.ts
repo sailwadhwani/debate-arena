@@ -8,6 +8,12 @@ import { createLLMClientFromEnv } from "../llm/client";
 import { executeReActLoop, type ReActStep } from "../llm/react-loop";
 import { toolRegistry } from "../tools/registry";
 import { debateEventEmitter } from "../events/emitter";
+import {
+  getRelevantMemories,
+  addMemory,
+  recordDebateParticipation,
+  type MemoryEntry,
+} from "../storage/agent-memory";
 
 export interface DebateContext {
   debateId: string;
@@ -55,11 +61,34 @@ export class DebateAgent {
   async generateArgument(context: DebateContext): Promise<DebateAgentResult> {
     const { debateId, task, documentContent, round, previousArguments } = context;
 
+    const startTime = Date.now();
+    console.log(`\n${"=".repeat(60)}`);
+    console.log(`[${this.name}] Starting turn - Round ${round}`);
+    console.log(`[${this.name}] Received ${previousArguments.length} previous arguments:`);
+    previousArguments.forEach((arg, i) => {
+      console.log(`  ${i + 1}. ${arg.agentName}: "${arg.content.substring(0, 80)}..."`);
+    });
+
+    // Record debate participation
+    if (round === 1) {
+      await recordDebateParticipation(this.id).catch(() => {});
+    }
+
+    // Fetch relevant memories from past debates
+    let memories: MemoryEntry[] = [];
+    try {
+      memories = await getRelevantMemories(this.id, task, 3);
+    } catch {
+      // Silently fail if memory retrieval fails
+    }
+
     // Build context from previous arguments
     const previousContext = this.buildPreviousContext(previousArguments);
 
-    // Build the prompt
-    const prompt = this.buildPrompt(task, documentContent, round, previousContext);
+    // Build the prompt with memories
+    const prompt = this.buildPrompt(task, documentContent, round, previousContext, memories);
+
+    console.log(`[${this.name}] Calling LLM...`);
 
     // Get available tools for this agent
     const tools = toolRegistry.getDefinitionsForNames(this.config.tools);
@@ -113,6 +142,11 @@ export class DebateAgent {
       timestamp: new Date(),
     };
 
+    const elapsed = Date.now() - startTime;
+    console.log(`[${this.name}] Completed in ${elapsed}ms`);
+    console.log(`[${this.name}] Response: "${content.substring(0, 100)}..."`);
+    console.log(`${"=".repeat(60)}\n`);
+
     return {
       argument,
       reactSteps: result.steps,
@@ -129,7 +163,8 @@ export class DebateAgent {
     task: string,
     documentContent: string | undefined,
     round: number,
-    previousContext: string
+    previousContext: string,
+    memories: MemoryEntry[] = []
   ): string {
     let prompt = `Topic: ${task}\n`;
 
@@ -138,6 +173,15 @@ export class DebateAgent {
         ? documentContent.substring(0, 4000) + "\n[Document truncated...]"
         : documentContent;
       prompt += `\nDocument:\n${truncated}\n`;
+    }
+
+    // Include relevant memories from past debates
+    if (memories.length > 0) {
+      prompt += `\n[Your relevant insights from past debates:`;
+      for (const mem of memories) {
+        prompt += `\n- (On "${mem.topic}"): ${mem.insight}`;
+      }
+      prompt += `]\n`;
     }
 
     prompt += `\nRound: ${round}`;

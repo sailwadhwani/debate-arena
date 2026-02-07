@@ -224,6 +224,62 @@ body {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
+/* Sci-fi HUD animations */
+@keyframes slideRight {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(60px);
+    opacity: 0;
+  }
+}
+
+@keyframes scanLine {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes dataStream {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+@keyframes glitchText {
+  0%, 100% {
+    clip-path: inset(0 0 0 0);
+  }
+  10% {
+    clip-path: inset(20% 0 60% 0);
+  }
+  20% {
+    clip-path: inset(40% 0 20% 0);
+  }
+  30% {
+    clip-path: inset(60% 0 0% 0);
+  }
+}
+
+.animate-scan-line {
+  animation: scanLine 3s linear infinite;
+}
+
+.animate-data-stream {
+  animation: dataStream 2s linear infinite;
+}
+
 /* ============================================================================
    GLASS MORPHISM UTILITIES
    ============================================================================ */

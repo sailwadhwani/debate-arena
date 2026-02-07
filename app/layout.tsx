@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { DebateProvider } from "@/contexts/DebateContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { MetaAgentProvider } from "@/contexts/MetaAgentContext";
+import { MetaAgentWrapper } from "@/components/meta-agent/MetaAgentWrapper";
 
 export const metadata: Metadata = {
   title: "Debate Arena - Multi-Agent AI Debate Platform",
@@ -49,7 +51,12 @@ export default function RootLayout({
       </head>
       <body className="antialiased min-h-screen">
         <ThemeProvider>
-          <DebateProvider>{children}</DebateProvider>
+          <MetaAgentProvider>
+            <DebateProvider>
+              {children}
+              <MetaAgentWrapper />
+            </DebateProvider>
+          </MetaAgentProvider>
         </ThemeProvider>
       </body>
     </html>

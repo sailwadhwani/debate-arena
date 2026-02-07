@@ -1,0 +1,391 @@
+{
+  "agentId": "product-manager",
+  "memories": [
+    {
+      "id": "mem-1770007720390-8l79g4niqd5",
+      "topic": "rice or noodles ",
+      "insight": "As a scientist, I have analyzed recent data from the World Health Organization and Food and Agriculture Organization (FAO)",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 1,
+        "timestamp": "2026-02-02T04:48:40.390Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720397-jdk228zbxyd",
+      "topic": "rice or noodles ",
+      "insight": "As a scientist, recent studies have highlighted that while rice is indeed the staple food for a larger portion of the world's population, with over 90% of rice production occurring in Asia, noodles al...",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 2,
+        "timestamp": "2026-02-02T04:48:40.397Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720402-luur5dsaq8",
+      "topic": "rice or noodles ",
+      "insight": "As a scientist, recent studies have also indicated that while rice remains a staple food for over 6 billion people worldwide, particularly in Asia and South Asia, noodles are increasingly popular, esp...",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 3,
+        "timestamp": "2026-02-02T04:48:40.402Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720406-m1g5j09emnf",
+      "topic": "rice or noodles ",
+      "insight": "As a scientist, recent studies have highlighted that while rice continues to be a staple food for over 6 billion people worldwide, particularly in Asia and South Asia, the consumption of noodles is al...",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 4,
+        "timestamp": "2026-02-02T04:48:40.406Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720409-skarfgftwuf",
+      "topic": "rice or noodles ",
+      "insight": "As a scientist, recent studies have also indicated that while rice continues to be a dominant staple food for over 6 billion people worldwide, particularly in Asia and South Asia, the consumption of n...",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 5,
+        "timestamp": "2026-02-02T04:48:40.409Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007968982-3foss8s69yc",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have indicated that while rice remains a staple food for over 6 billion people worldwide, particularly in Asia and South Asia, noodles are increasingly popular, especial...",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 1,
+        "timestamp": "2026-02-02T04:52:48.982Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007968986-pi9go3gujzn",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have also indicated that while rice continues to be the staple for over 6 billion people worldwide, particularly in Asia and South Asia, there is an increasing trend of ...",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 2,
+        "timestamp": "2026-02-02T04:52:48.986Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007969001-zh7c71vjb5d",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have further highlighted the increasing popularity of noodles alongside rice",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 3,
+        "timestamp": "2026-02-02T04:52:49.001Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007969004-2icfkmypg7l",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have indicated that while rice continues to be the staple for over 6 billion people worldwide, particularly in Asia and South Asia, there is also an increasing trend of ...",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 4,
+        "timestamp": "2026-02-02T04:52:49.004Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007969005-grwh0pvbse9",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have further highlighted the versatility of both rice and noodles in meeting diverse dietary needs and preferences globally",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 5,
+        "timestamp": "2026-02-02T04:52:49.005Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530241-9ab5a4rkec",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have indicated that while rice remains the staple food for over 6 billion people worldwide, particularly in Asia and South Asia, noodles are increasingly popular, especi...",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 1,
+        "timestamp": "2026-02-02T05:02:10.241Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530245-koshnbqlzy",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have also indicated that while rice continues to be a staple food for over 6 billion people worldwide, particularly in Asia and South Asia, the popularity of noodles is ...",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 2,
+        "timestamp": "2026-02-02T05:02:10.245Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530248-xim1bu5tu2",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have further highlighted that while rice remains a staple food for over 6 billion people worldwide, particularly in Asia and South Asia, the popularity of noodles is inc...",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 3,
+        "timestamp": "2026-02-02T05:02:10.248Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530261-sazhpypk0jf",
+      "topic": "Rice or noodles\n",
+      "insight": "As a scientist, recent studies have also indicated that while rice continues to be a staple food for over 6 billion people worldwide, particularly in Asia and South Asia, the popularity of noodles is ...",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 4,
+        "timestamp": "2026-02-02T05:02:10.261Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682467-9jz9uf34tqd",
+      "topic": "discuss snow or rain",
+      "insight": "From a scientific standpoint, both snow and rain are critical components of Earth's climate system",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 1,
+        "timestamp": "2026-02-02T05:04:42.467Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682497-cecbuem6pvi",
+      "topic": "discuss snow or rain",
+      "insight": "From a scientific standpoint, both snow and rain play indispensable roles in Earth's climate system",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 2,
+        "timestamp": "2026-02-02T05:04:42.497Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682499-yyhvftf8jn",
+      "topic": "discuss snow or rain",
+      "insight": "From a scientific standpoint, both snow and rain are critical components of Earth's hydrological cycle",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 3,
+        "timestamp": "2026-02-02T05:04:42.499Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909940-70kxkxje7px",
+      "topic": "discuss snow or rain",
+      "insight": "From a scientific standpoint, both snow and rain are critical components of Earth's climate system, playing indispensable roles in the hydrological cycle and maintaining biodiversity and ecosystem bal...",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 1,
+        "timestamp": "2026-02-02T05:08:29.940Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909943-uh741775jp",
+      "topic": "discuss snow or rain",
+      "insight": "From a scientific standpoint, both snow and rain are critical components of Earth's climate system, playing indispensable roles in the hydrological cycle and maintaining biodiversity and ecosystem bal...",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 2,
+        "timestamp": "2026-02-02T05:08:29.943Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909943-uaf3njr2f0b",
+      "topic": "discuss snow or rain",
+      "insight": "From a scientific standpoint, both snow and rain are critical components of Earth's climate system, playing indispensable roles in the hydrological cycle and maintaining biodiversity and ecosystem bal...",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 3,
+        "timestamp": "2026-02-02T05:08:29.943Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909944-czgk8dgepx",
+      "topic": "discuss snow or rain",
+      "insight": "From a scientific standpoint, both snow and rain are critical components of Earth's climate system, playing indispensable roles in the hydrological cycle and maintaining biodiversity and ecosystem bal...",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 4,
+        "timestamp": "2026-02-02T05:08:29.944Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909946-lldwlvk30m9",
+      "topic": "discuss snow or rain",
+      "insight": "From a scientific standpoint, both snow and rain are critical components of Earth's climate system, playing indispensable roles in the hydrological cycle and maintaining biodiversity and ecosystem bal...",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 5,
+        "timestamp": "2026-02-02T05:08:29.946Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524742-ybcve43svtk",
+      "topic": "rice or noodles\n",
+      "insight": "As a scientist, recent studies have indicated that while rice remains the staple food for over 6 billion people worldwide, particularly in Asia and South Asia, noodles are increasingly popular, especi...",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 1,
+        "timestamp": "2026-02-02T05:18:44.742Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524754-rxn70oyoh9a",
+      "topic": "rice or noodles\n",
+      "insight": "As a scientist, recent studies have also indicated that while rice continues to be a staple for over 6 billion people worldwide, particularly in Asia and South Asia, there is growing evidence suggesti...",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 2,
+        "timestamp": "2026-02-02T05:18:44.754Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524766-swwk70ou32f",
+      "topic": "rice or noodles\n",
+      "insight": "As a scientist, recent studies have further highlighted that while rice continues to be a staple for over 6 billion people worldwide, particularly in Asia and South Asia, there is growing evidence sug...",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 3,
+        "timestamp": "2026-02-02T05:18:44.766Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524770-3macigwdqvk",
+      "topic": "rice or noodles\n",
+      "insight": "As a scientist, recent studies indicate that while rice remains a staple for over 6 billion people worldwide, particularly in Asia and South Asia, there is growing evidence suggesting that noodles are...",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 4,
+        "timestamp": "2026-02-02T05:18:44.770Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524800-s7if7kdrf4",
+      "topic": "rice or noodles\n",
+      "insight": "As a scientist, recent studies have highlighted the global consumption patterns and nutritional benefits of both rice and noodles",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 5,
+        "timestamp": "2026-02-02T05:18:44.800Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541779-azuwzj554l6",
+      "topic": "rice or noodles",
+      "insight": "As a scientist, recent studies have indicated that while rice remains the staple food for over 6 billion people worldwide, particularly in Asia and South Asia, noodles are increasingly popular, especi...",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 1,
+        "timestamp": "2026-02-02T05:19:01.779Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541781-o72dkur1v1o",
+      "topic": "rice or noodles",
+      "insight": "As a scientist, recent studies have also indicated that while rice continues to be a staple food for over 6 billion people worldwide, particularly in Asia and South Asia, noodles are increasingly popu...",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 2,
+        "timestamp": "2026-02-02T05:19:01.781Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541782-n1g7s5xsokk",
+      "topic": "rice or noodles",
+      "insight": "As a scientist, recent data from the World Health Organization and Food and Agriculture Organization (FAO) show that while rice continues to be a staple food for over 6 billion people worldwide, parti...",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 3,
+        "timestamp": "2026-02-02T05:19:01.782Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541783-jzp9hwgey1",
+      "topic": "rice or noodles",
+      "insight": "As a scientist, recent studies have highlighted that while rice continues to be a staple food for over 6 billion people worldwide, particularly in Asia and South Asia, there is also growing consumptio...",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 4,
+        "timestamp": "2026-02-02T05:19:01.783Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770483721675-afvrl26p32d",
+      "topic": "rice or dal",
+      "insight": "As a scientist, recent data from the World Health Organization (WHO) and Food and Agriculture Organization (FAO) indicate that while rice is indeed the staple food for a larger portion of the world's ...",
+      "source": {
+        "debateId": "debate-1770483685526",
+        "round": 1,
+        "timestamp": "2026-02-07T17:02:01.675Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    }
+  ],
+  "lastUpdated": "2026-02-07T17:02:01.675Z",
+  "totalDebates": 8
+}

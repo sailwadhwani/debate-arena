@@ -11,8 +11,9 @@ import { FloatingNav } from "@/components/nav/FloatingNav";
 import { useDebateStream } from "@/hooks/useDebateStream";
 import { useAgentConfig } from "@/hooks/useAgentConfig";
 import { useDebateContext } from "@/contexts/DebateContext";
+import { useDebateAudio } from "@/hooks/useDebateAudio";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { X, MessageSquare, ChevronRight, ChevronLeft, Pause, Play, Sparkles } from "lucide-react";
+import { X, MessageSquare, ChevronRight, ChevronLeft, Pause, Play, Sparkles, Share2, Users, Volume2, VolumeX } from "lucide-react";
 
 // Dynamically import 3D scene and ParticleBackground to avoid SSR issues
 const DebateScene = dynamic(
@@ -131,6 +132,37 @@ export function DebateArena() {
   const ctx = useDebateContext();
   const { config, loading: configLoading } = useAgentConfig();
   const debateStream = useDebateStream();
+  const [audioEnabled, setAudioEnabled] = useState(false);
+
+  // Get the speaking agent's color for audio
+  const speakingAgentColor = useMemo(() => {
+    if (!debateStream.speakingAgent || !config) return undefined;
+    const agent = config.agents.find(a => a.id === debateStream.speakingAgent);
+    return agent?.color;
+  }, [debateStream.speakingAgent, config]);
+
+  // Audio system
+  const { initialize: initAudio, isInitialized: audioReady } = useDebateAudio(
+    {
+      status: debateStream.status,
+      speakingAgentId: debateStream.speakingAgent,
+      agentColor: speakingAgentColor,
+      argumentCount: debateStream.rounds.reduce((sum, r) => sum + r.arguments.length, 0),
+    },
+    { enabled: audioEnabled, volume: 0.5 }
+  );
+
+  // Handle audio toggle
+  const handleAudioToggle = useCallback(async () => {
+    if (!audioEnabled) {
+      const success = await initAudio();
+      if (success) {
+        setAudioEnabled(true);
+      }
+    } else {
+      setAudioEnabled(false);
+    }
+  }, [audioEnabled, initAudio]);
 
   // Sync debate stream state to context when it changes
   useEffect(() => {
@@ -140,6 +172,7 @@ export function DebateArena() {
       ctx.setCurrentRound(debateStream.currentRound);
       ctx.setSpeakingAgent(debateStream.speakingAgent);
       ctx.setThinkingAgent(debateStream.thinkingAgent);
+      ctx.setCurrentTool(debateStream.currentTool);
       ctx.setModeratorSteps(debateStream.moderatorSteps);
       ctx.setSummary(debateStream.summary);
       ctx.setError(debateStream.error);
@@ -150,6 +183,7 @@ export function DebateArena() {
     debateStream.currentRound,
     debateStream.speakingAgent,
     debateStream.thinkingAgent,
+    debateStream.currentTool,
     debateStream.moderatorSteps,
     debateStream.summary,
     debateStream.error,
@@ -168,6 +202,7 @@ export function DebateArena() {
   const currentRound = ctx.debateId ? ctx.currentRound : debateStream.currentRound;
   const speakingAgent = ctx.debateId ? ctx.speakingAgent : debateStream.speakingAgent;
   const thinkingAgent = ctx.debateId ? ctx.thinkingAgent : debateStream.thinkingAgent;
+  const currentTool = ctx.debateId ? ctx.currentTool : debateStream.currentTool;
   const moderatorSteps = ctx.debateId ? ctx.moderatorSteps : debateStream.moderatorSteps;
   const summary = ctx.debateId ? ctx.summary : debateStream.summary;
   const error = ctx.debateId ? ctx.error : debateStream.error;
@@ -175,6 +210,45 @@ export function DebateArena() {
 
   // Local state for moderator panel visibility
   const [showModeratorPanel, setShowModeratorPanel] = useState(false);
+  const [viewerCount, setViewerCount] = useState(0);
+
+  // Fetch viewer count when debate is active
+  useEffect(() => {
+    if (!ctx.debateId || status === "idle" || status === "complete") return;
+
+    const fetchViewerCount = async () => {
+      try {
+        const response = await fetch(`/api/debate/${ctx.debateId}/collab`);
+        if (response.ok) {
+          const data = await response.json();
+          setViewerCount(data.viewerCount);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+
+    fetchViewerCount();
+    const interval = setInterval(fetchViewerCount, 10000);
+    return () => clearInterval(interval);
+  }, [ctx.debateId, status]);
+
+  // Handle sharing
+  const handleShare = useCallback(async () => {
+    if (!ctx.debateId) return;
+
+    try {
+      const response = await fetch(`/api/debate/${ctx.debateId}/collab`);
+      if (response.ok) {
+        const data = await response.json();
+        const shareUrl = `${window.location.origin}${data.shareUrl}`;
+        await navigator.clipboard.writeText(shareUrl);
+        alert("Share link copied to clipboard!");
+      }
+    } catch {
+      alert("Failed to copy share link");
+    }
+  }, [ctx.debateId]);
 
   // Agent info for visualization
   const agents = useMemo(() => {
@@ -277,6 +351,7 @@ export function DebateArena() {
           arguments={allArguments}
           status={status}
           thinkingAgentId={thinkingAgent}
+          currentTool={currentTool}
           summary={summary}
           task={ctx.task}
           onReset={handleReset}
@@ -308,6 +383,36 @@ export function DebateArena() {
 
         {/* Control buttons - hide when complete */}
         <div className={`absolute top-4 right-4 z-10 flex items-center gap-2 safe-area-right ${status === "complete" ? "hidden" : ""}`}>
+          {/* Viewer count */}
+          {status !== "idle" && viewerCount > 0 && (
+            <div className="px-3 py-2 rounded-lg glass text-[var(--accent-primary)] text-sm flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              <span>{viewerCount}</span>
+            </div>
+          )}
+          {/* Audio toggle */}
+          {status !== "idle" && (
+            <button
+              onClick={handleAudioToggle}
+              className={`px-3 py-2 rounded-lg glass text-sm hover:bg-white/10 transition-colors flex items-center gap-2 ${
+                audioEnabled && audioReady ? "text-cyan-400" : "text-[var(--foreground)]"
+              }`}
+              title={audioEnabled ? "Mute audio" : "Enable audio (click to activate)"}
+            >
+              {audioEnabled && audioReady ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            </button>
+          )}
+          {/* Share button */}
+          {status !== "idle" && status !== "complete" && (
+            <button
+              onClick={handleShare}
+              className="px-3 py-2 rounded-lg glass text-[var(--foreground)] text-sm hover:bg-white/10 transition-colors flex items-center gap-2"
+              title="Share live debate"
+            >
+              <Share2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+          )}
           {(status === "debating" || status === "paused") && (
             <>
               {status === "debating" ? (

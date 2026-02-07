@@ -83,10 +83,20 @@ export async function updateAgent(id: string, updates: Partial<AgentConfig>): Pr
 }
 
 /**
- * Add a new agent
+ * Add a new agent (skips if ID already exists)
  */
 export async function addAgent(agent: AgentConfig): Promise<AgentConfig> {
   const config = await loadAgentsConfig();
+
+  // Check if agent with this ID already exists
+  const existingIndex = config.agents.findIndex((a) => a.id === agent.id);
+  if (existingIndex !== -1) {
+    // Update existing agent instead of adding duplicate
+    config.agents[existingIndex] = agent;
+    await saveAgentsConfig(config);
+    return agent;
+  }
+
   config.agents.push(agent);
   await saveAgentsConfig(config);
   return agent;

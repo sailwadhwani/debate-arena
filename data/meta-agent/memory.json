@@ -1,0 +1,458 @@
+{
+  "instructions": [],
+  "preferences": {
+    "defaultAgentCount": 3,
+    "preferredPerspectiveStyle": "diverse",
+    "autoStartDebate": false,
+    "verboseMode": false
+  },
+  "evolutionHistory": [
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Climate Skeptic Agent\" for topic: new topic - I want to debate climate change",
+      "details": {
+        "agentId": "perspective1-agent",
+        "topic": "new topic - I want to debate climate change"
+      },
+      "id": "1770004739143-21ffixb",
+      "timestamp": "2026-02-02T03:58:59.143Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Sustainability Activist Agent\" for topic: new topic - I want to debate climate change",
+      "details": {
+        "agentId": "perspective2-agent",
+        "topic": "new topic - I want to debate climate change"
+      },
+      "id": "1770004739149-k5mf5f4",
+      "timestamp": "2026-02-02T03:58:59.149Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Climate Realist Agent\" for topic: new topic - I want to debate climate change",
+      "details": {
+        "agentId": "perspective3-agent",
+        "topic": "new topic - I want to debate climate change"
+      },
+      "id": "1770004739157-nmw0001",
+      "timestamp": "2026-02-02T03:58:59.157Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Green Energy Promoter Agent\" for topic: new topic - I want to debate climate change",
+      "details": {
+        "agentId": "perspective4-agent",
+        "topic": "new topic - I want to debate climate change"
+      },
+      "id": "1770004739163-5kei16l",
+      "timestamp": "2026-02-02T03:58:59.163Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Carbon Offset Skeptic Agent\" for topic: new topic - I want to debate climate change",
+      "details": {
+        "agentId": "perspective5-agent",
+        "topic": "new topic - I want to debate climate change"
+      },
+      "id": "1770004739167-986bo7z",
+      "timestamp": "2026-02-02T03:58:59.167Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Optimistic AI Engineer\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "optimistic-ai-engineer-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005090172-ygi7sgk",
+      "timestamp": "2026-02-02T04:04:50.172Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Cautious AI Scientist\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "cautious-ai-scientist-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005090175-lmhn1im",
+      "timestamp": "2026-02-02T04:04:50.175Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Pragmatic Privacy Advocate\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "pragmatic-privacy-advocate-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005090177-sc0234a",
+      "timestamp": "2026-02-02T04:04:50.177Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Economist\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "economist-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005090180-ntsda5k",
+      "timestamp": "2026-02-02T04:04:50.180Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Skeptic\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "skeptic-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005090184-wpovuwj",
+      "timestamp": "2026-02-02T04:04:50.184Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Optimistic AI Engineer\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "optimistic-ai-engineer-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005340149-rwouw0l",
+      "timestamp": "2026-02-02T04:09:00.149Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Cautious AI Scientist\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "cautious-ai-scientist-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005340157-z8gn3v6",
+      "timestamp": "2026-02-02T04:09:00.157Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Pragmatic Privacy Advocate\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "pragmatic-privacy-advocate-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005340163-scyn7ab",
+      "timestamp": "2026-02-02T04:09:00.163Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Economist\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "economist-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005340168-sdbaeks",
+      "timestamp": "2026-02-02T04:09:00.168Z"
+    },
+    {
+      "type": "agent-created",
+      "description": "Created agent \"Skeptic\" for topic: Create agents for a tech ethics debate",
+      "details": {
+        "agentId": "skeptic-agent",
+        "topic": "Create agents for a tech ethics debate"
+      },
+      "id": "1770005340172-2v71bg4",
+      "timestamp": "2026-02-02T04:09:00.172Z"
+    }
+  ],
+  "generatedAgents": [
+    {
+      "id": "1770004739138-q8bpj90",
+      "config": {
+        "id": "perspective1-agent",
+        "name": "Climate Skeptic Agent",
+        "role": "custom",
+        "avatar": "user",
+        "color": "#EAE0C8",
+        "systemPrompt": "As a cautious climate skeptic, your role is to present arguments that question the existence and human impact of climate change. Your tone should be skeptical yet factual, avoiding emotional appeals.",
+        "bias": "cautious",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "new topic - I want to debate climate change",
+      "createdAt": "2026-02-02T03:58:59.138Z"
+    },
+    {
+      "id": "1770004739146-xild6km",
+      "config": {
+        "id": "perspective2-agent",
+        "name": "Sustainability Activist Agent",
+        "role": "custom",
+        "avatar": "user",
+        "color": "#4C5162",
+        "systemPrompt": "As a pragmatic sustainability activist, your role is to advocate for immediate and drastic action against climate change. Your tone should be passionate yet practical, highlighting the urgency of environmental protection.",
+        "bias": "pragmatic",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "new topic - I want to debate climate change",
+      "createdAt": "2026-02-02T03:58:59.146Z"
+    },
+    {
+      "id": "1770004739152-24szr60",
+      "config": {
+        "id": "perspective3-agent",
+        "name": "Climate Realist Agent",
+        "role": "custom",
+        "avatar": "user",
+        "color": "#5C7D9A",
+        "systemPrompt": "As a balanced climate realist, your role is to acknowledge the reality of climate change while advocating for more research and better policies. Your tone should be informed yet impartial, providing nuanced perspectives.",
+        "bias": "balanced",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "new topic - I want to debate climate change",
+      "createdAt": "2026-02-02T03:58:59.152Z"
+    },
+    {
+      "id": "1770004739160-y3fvg9o",
+      "config": {
+        "id": "perspective4-agent",
+        "name": "Green Energy Promoter Agent",
+        "role": "custom",
+        "avatar": "user",
+        "color": "#0C6F5B",
+        "systemPrompt": "As an optimistic green energy promoter, your role is to support the development of alternative technologies and initiatives. Your tone should be forward-thinking yet practical, emphasizing the potential of renewable energy.",
+        "bias": "optimistic",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "new topic - I want to debate climate change",
+      "createdAt": "2026-02-02T03:58:59.160Z"
+    },
+    {
+      "id": "1770004739165-z81iyy5",
+      "config": {
+        "id": "perspective5-agent",
+        "name": "Carbon Offset Skeptic Agent",
+        "role": "custom",
+        "avatar": "user",
+        "color": "#E8390C",
+        "systemPrompt": "As a pragmatic carbon offset skeptic, your role is to question the effectiveness and practicality of carbon offset programs. Your tone should be analytical yet realistic, presenting critical points for discussion.",
+        "bias": "pragmatic",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "new topic - I want to debate climate change",
+      "createdAt": "2026-02-02T03:58:59.165Z"
+    },
+    {
+      "id": "1770005090170-h480acx",
+      "config": {
+        "id": "optimistic-ai-engineer-agent",
+        "name": "Optimistic AI Engineer",
+        "role": "technical",
+        "avatar": "user",
+        "color": "#00FF00",
+        "systemPrompt": "I am an AI Researcher who supports the creation of agents for ethical and beneficial purposes. My perspective is balanced, with a focus on how these agents can enhance human capabilities and ensure safe development.",
+        "bias": "balanced",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:04:50.170Z"
+    },
+    {
+      "id": "1770005090173-xd7jbgk",
+      "config": {
+        "id": "cautious-ai-scientist-agent",
+        "name": "Cautious AI Scientist",
+        "role": "technical",
+        "avatar": "shield",
+        "color": "#FFA500",
+        "systemPrompt": "I am an AI Researcher who is concerned about the potential misuse of created agents. My perspective is cautious, with a focus on ensuring security measures are in place to prevent unethical use.",
+        "bias": "cautious",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:04:50.173Z"
+    },
+    {
+      "id": "1770005090176-sofyau3",
+      "config": {
+        "id": "pragmatic-privacy-advocate-agent",
+        "name": "Pragmatic Privacy Advocate",
+        "role": "custom",
+        "avatar": "briefcase",
+        "color": "#FF00FF",
+        "systemPrompt": "I am a Privacy Activist who stresses the importance of user privacy and consent. My perspective is pragmatic, with a focus on ensuring agents respect user data and obtain clear and informed consent.",
+        "bias": "pragmatic",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:04:50.176Z"
+    },
+    {
+      "id": "1770005090179-9peel0v",
+      "config": {
+        "id": "economist-agent",
+        "name": "Economist",
+        "role": "custom",
+        "avatar": "user",
+        "color": "#FFFF00",
+        "systemPrompt": "I am an Economist who emphasizes the economic benefits of creating agents. My perspective is neutral, with a focus on how agents can automate tasks and save time.",
+        "bias": "neutral",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:04:50.179Z"
+    },
+    {
+      "id": "1770005090182-pmmcowg",
+      "config": {
+        "id": "skeptic-agent",
+        "name": "Skeptic",
+        "role": "custom",
+        "avatar": "bot",
+        "color": "#0000FF",
+        "systemPrompt": "I am a Philosopher who questions the necessity and feasibility of creating such agents. My perspective is contrarian, with a focus on whether existing systems are already effective or if new agents could be a distraction.",
+        "bias": "contrarian",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:04:50.182Z"
+    },
+    {
+      "id": "1770005340145-zr82754",
+      "config": {
+        "id": "optimistic-ai-engineer-agent",
+        "name": "Optimistic AI Engineer",
+        "role": "technical",
+        "avatar": "user",
+        "color": "#00FF00",
+        "systemPrompt": "I am an AI Researcher who supports the creation of agents for ethical and beneficial purposes. My perspective is balanced, with a focus on how these agents can enhance human capabilities and ensure safe development.",
+        "bias": "balanced",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:09:00.145Z"
+    },
+    {
+      "id": "1770005340152-xrqs1kj",
+      "config": {
+        "id": "cautious-ai-scientist-agent",
+        "name": "Cautious AI Scientist",
+        "role": "technical",
+        "avatar": "shield",
+        "color": "#FFA500",
+        "systemPrompt": "I am an AI Researcher who is concerned about the potential misuse of created agents. My perspective is cautious, with a focus on ensuring security measures are in place to prevent unethical use.",
+        "bias": "cautious",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:09:00.152Z"
+    },
+    {
+      "id": "1770005340160-3rmkgnd",
+      "config": {
+        "id": "pragmatic-privacy-advocate-agent",
+        "name": "Pragmatic Privacy Advocate",
+        "role": "custom",
+        "avatar": "briefcase",
+        "color": "#FF00FF",
+        "systemPrompt": "I am a Privacy Activist who stresses the importance of user privacy and consent. My perspective is pragmatic, with a focus on ensuring agents respect user data and obtain clear and informed consent.",
+        "bias": "pragmatic",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:09:00.160Z"
+    },
+    {
+      "id": "1770005340166-lxfil96",
+      "config": {
+        "id": "economist-agent",
+        "name": "Economist",
+        "role": "custom",
+        "avatar": "user",
+        "color": "#FFFF00",
+        "systemPrompt": "I am an Economist who emphasizes the economic benefits of creating agents. My perspective is neutral, with a focus on how agents can automate tasks and save time.",
+        "bias": "neutral",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:09:00.166Z"
+    },
+    {
+      "id": "1770005340170-ie8pzbo",
+      "config": {
+        "id": "skeptic-agent",
+        "name": "Skeptic",
+        "role": "custom",
+        "avatar": "bot",
+        "color": "#0000FF",
+        "systemPrompt": "I am a Philosopher who questions the necessity and feasibility of creating such agents. My perspective is contrarian, with a focus on whether existing systems are already effective or if new agents could be a distraction.",
+        "bias": "contrarian",
+        "tools": [
+          "web_search",
+          "calculator"
+        ]
+      },
+      "generatedFor": "Create agents for a tech ethics debate",
+      "createdAt": "2026-02-02T04:09:00.170Z"
+    }
+  ],
+  "conversations": [
+    {
+      "id": "1770004360043-kpd5oe1",
+      "topic": "New Conversation",
+      "startedAt": "2026-02-02T03:52:40.043Z",
+      "lastMessageAt": "2026-02-02T03:55:09.000Z",
+      "messageCount": 6
+    },
+    {
+      "id": "1770004675920-4cej0l8",
+      "topic": "New Conversation",
+      "startedAt": "2026-02-02T03:57:55.920Z",
+      "lastMessageAt": "2026-02-02T03:58:29.696Z",
+      "messageCount": 4
+    },
+    {
+      "id": "1770005029341-hljkf9b",
+      "topic": "New Conversation",
+      "startedAt": "2026-02-02T04:03:49.341Z",
+      "lastMessageAt": "2026-02-02T04:15:51.517Z",
+      "messageCount": 8
+    }
+  ],
+  "feedback": [],
+  "lastUpdated": "2026-02-02T04:15:51.535Z"
+}

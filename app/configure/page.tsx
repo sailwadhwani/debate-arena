@@ -28,6 +28,11 @@ import {
   Sliders,
   Users,
   GripVertical,
+  Wrench,
+  Globe,
+  Code,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 import { useAgentConfig } from "@/hooks/useAgentConfig";
 import { FloatingNav } from "@/components/nav/FloatingNav";
@@ -1234,6 +1239,384 @@ function LlmLogsTab() {
 }
 
 // ============================================================================
+// TOOLS TAB
+// ============================================================================
+
+interface ToolConfig {
+  name: string;
+  description: string;
+  enabled: boolean;
+  requiresApiKey?: string;
+  type?: "builtin" | "custom";
+  inputSchema?: {
+    type: "object";
+    properties: Record<string, { type: string; description: string }>;
+    required?: string[];
+  };
+  implementation?: {
+    type: "api" | "template";
+    endpoint?: string;
+    method?: "GET" | "POST";
+    template?: string;
+  };
+}
+
+function ToolsTab() {
+  const [tools, setTools] = useState<ToolConfig[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTool, setNewTool] = useState<Partial<ToolConfig>>({
+    name: "",
+    description: "",
+    enabled: true,
+    type: "custom",
+    implementation: { type: "template", template: "" },
+  });
+
+  useEffect(() => {
+    fetchTools();
+  }, []);
+
+  async function fetchTools() {
+    try {
+      const response = await fetch("/api/settings/tools");
+      if (response.ok) {
+        const data = await response.json();
+        setTools(data.tools || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tools:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function toggleTool(toolName: string) {
+    try {
+      const response = await fetch("/api/settings/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle", toolName }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTools((prev) =>
+          prev.map((t) => (t.name === toolName ? { ...t, enabled: data.enabled } : t))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to toggle tool:", error);
+    }
+  }
+
+  async function deleteTool(toolName: string) {
+    if (!confirm("Are you sure you want to delete this tool?")) return;
+
+    try {
+      const response = await fetch("/api/settings/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", toolName }),
+      });
+      if (response.ok) {
+        setTools((prev) => prev.filter((t) => t.name !== toolName));
+      }
+    } catch (error) {
+      console.error("Failed to delete tool:", error);
+    }
+  }
+
+  async function addTool() {
+    if (!newTool.name || !newTool.description) {
+      alert("Name and description are required");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch("/api/settings/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "add", tool: newTool }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTools((prev) => [...prev, data.tool]);
+        setShowAddModal(false);
+        setNewTool({
+          name: "",
+          description: "",
+          enabled: true,
+          type: "custom",
+          implementation: { type: "template", template: "" },
+        });
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to add tool");
+      }
+    } catch (error) {
+      console.error("Failed to add tool:", error);
+      alert("Failed to add tool");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-[var(--foreground)]">Agent Tools</h2>
+          <p className="text-sm text-[var(--foreground-muted)]">
+            Configure tools that agents can use during debates
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent-primary)] text-white hover:opacity-90 transition-opacity"
+        >
+          <Plus className="w-4 h-4" />
+          Add Tool
+        </button>
+      </div>
+
+      {/* Tools List */}
+      <div className="grid gap-4">
+        {tools.map((tool) => (
+          <Card key={tool.name}>
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    {tool.type === "custom" ? (
+                      <Code className="w-5 h-5 text-purple-400" />
+                    ) : (
+                      <Wrench className="w-5 h-5 text-[var(--accent-primary)]" />
+                    )}
+                    <h3 className="font-medium text-[var(--foreground)]">{tool.name}</h3>
+                    {tool.type === "custom" && (
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-purple-500/20 text-purple-400">
+                        Custom
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-[var(--foreground-muted)] mt-1">
+                    {tool.description}
+                  </p>
+                  {tool.requiresApiKey && (
+                    <p className="text-xs text-amber-400 mt-2">
+                      Requires: {tool.requiresApiKey}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleTool(tool.name)}
+                    className={`p-2 rounded-lg transition-colors ${
+                      tool.enabled
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : "bg-[var(--glass-border)] text-[var(--foreground-muted)]"
+                    }`}
+                    title={tool.enabled ? "Disable" : "Enable"}
+                  >
+                    {tool.enabled ? (
+                      <ToggleRight className="w-5 h-5" />
+                    ) : (
+                      <ToggleLeft className="w-5 h-5" />
+                    )}
+                  </button>
+                  {tool.type === "custom" && (
+                    <button
+                      onClick={() => deleteTool(tool.name)}
+                      className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+
+        {tools.length === 0 && (
+          <div className="text-center py-12 text-[var(--foreground-muted)]">
+            No tools configured. Add a custom tool to get started.
+          </div>
+        )}
+      </div>
+
+      {/* Add Tool Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-lg mx-4 rounded-2xl glass-strong p-6 space-y-4">
+            <h3 className="text-lg font-semibold text-[var(--foreground)]">Add Custom Tool</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--foreground-muted)] mb-1">
+                  Tool Name
+                </label>
+                <input
+                  type="text"
+                  value={newTool.name || ""}
+                  onChange={(e) =>
+                    setNewTool((prev) => ({ ...prev, name: e.target.value.replace(/\s/g, "_") }))
+                  }
+                  placeholder="my_custom_tool"
+                  className="w-full px-3 py-2 rounded-lg glass text-[var(--foreground)] bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--foreground-muted)] mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={newTool.description || ""}
+                  onChange={(e) => setNewTool((prev) => ({ ...prev, description: e.target.value }))}
+                  placeholder="What does this tool do?"
+                  rows={2}
+                  className="w-full px-3 py-2 rounded-lg glass text-[var(--foreground)] bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--foreground-muted)] mb-1">
+                  Implementation Type
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      setNewTool((prev) => ({
+                        ...prev,
+                        implementation: { type: "template", template: "" },
+                      }))
+                    }
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm ${
+                      newTool.implementation?.type === "template"
+                        ? "bg-[var(--accent-primary-muted)] text-[var(--accent-primary)]"
+                        : "glass text-[var(--foreground-muted)]"
+                    }`}
+                  >
+                    Template
+                  </button>
+                  <button
+                    onClick={() =>
+                      setNewTool((prev) => ({
+                        ...prev,
+                        implementation: { type: "api", endpoint: "", method: "GET" },
+                      }))
+                    }
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm ${
+                      newTool.implementation?.type === "api"
+                        ? "bg-[var(--accent-primary-muted)] text-[var(--accent-primary)]"
+                        : "glass text-[var(--foreground-muted)]"
+                    }`}
+                  >
+                    API Call
+                  </button>
+                </div>
+              </div>
+
+              {newTool.implementation?.type === "template" && (
+                <div>
+                  <label className="block text-sm font-medium text-[var(--foreground-muted)] mb-1">
+                    Response Template
+                  </label>
+                  <textarea
+                    value={newTool.implementation?.template || ""}
+                    onChange={(e) =>
+                      setNewTool((prev) => ({
+                        ...prev,
+                        implementation: { ...prev.implementation!, template: e.target.value },
+                      }))
+                    }
+                    placeholder="Template with {{input}} placeholders"
+                    rows={3}
+                    className="w-full px-3 py-2 rounded-lg glass text-[var(--foreground)] bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] resize-none font-mono text-sm"
+                  />
+                </div>
+              )}
+
+              {newTool.implementation?.type === "api" && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--foreground-muted)] mb-1">
+                      API Endpoint
+                    </label>
+                    <input
+                      type="text"
+                      value={newTool.implementation?.endpoint || ""}
+                      onChange={(e) =>
+                        setNewTool((prev) => ({
+                          ...prev,
+                          implementation: { ...prev.implementation!, endpoint: e.target.value },
+                        }))
+                      }
+                      placeholder="https://api.example.com/endpoint"
+                      className="w-full px-3 py-2 rounded-lg glass text-[var(--foreground)] bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--foreground-muted)] mb-1">
+                      Method
+                    </label>
+                    <select
+                      value={newTool.implementation?.method || "GET"}
+                      onChange={(e) =>
+                        setNewTool((prev) => ({
+                          ...prev,
+                          implementation: {
+                            ...prev.implementation!,
+                            method: e.target.value as "GET" | "POST",
+                          },
+                        }))
+                      }
+                      className="w-full px-3 py-2 rounded-lg glass text-[var(--foreground)] bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]"
+                    >
+                      <option value="GET">GET</option>
+                      <option value="POST">POST</option>
+                    </select>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="flex-1 px-4 py-2 rounded-lg glass text-[var(--foreground)] hover:bg-[var(--glass-border)] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={addTool}
+                disabled={saving || !newTool.name || !newTool.description}
+                className="flex-1 px-4 py-2 rounded-lg bg-[var(--accent-primary)] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Add Tool"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
 // MAIN CONFIGURE PAGE
 // ============================================================================
 
@@ -1282,6 +1665,10 @@ function ConfigurePageContent() {
             <FileText className="w-4 h-4" />
             LLM Logs
           </TabsTrigger>
+          <TabsTrigger value="tools" active={activeTab === "tools"} onClick={() => handleTabChange("tools")}>
+            <Wrench className="w-4 h-4" />
+            Tools
+          </TabsTrigger>
         </TabsList>
 
         {/* Tab Content */}
@@ -1290,6 +1677,7 @@ function ConfigurePageContent() {
           {activeTab === "agents" && <AgentsTab />}
           {activeTab === "moderator" && <ModeratorTab />}
           {activeTab === "logs" && <LlmLogsTab />}
+          {activeTab === "tools" && <ToolsTab />}
         </div>
       </div>
     </div>

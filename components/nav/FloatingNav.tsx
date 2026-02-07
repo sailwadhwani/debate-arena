@@ -12,7 +12,8 @@ import {
   Box,
   LayoutGrid,
   Info,
-  Home as HomeIcon
+  Home as HomeIcon,
+  History,
 } from "lucide-react";
 import { useTheme, Theme } from "@/contexts/ThemeContext";
 
@@ -99,6 +100,12 @@ export function FloatingNav({
         <Link href="/debate" className="floating-nav-item" onClick={() => setIsOpen(false)}>
           <HomeIcon className="w-5 h-5" />
           <span>Debate Arena</span>
+        </Link>
+
+        {/* History */}
+        <Link href="/history" className="floating-nav-item" onClick={() => setIsOpen(false)}>
+          <History className="w-5 h-5" />
+          <span>History</span>
         </Link>
 
         {/* View Toggle */}

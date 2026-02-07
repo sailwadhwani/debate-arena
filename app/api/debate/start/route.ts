@@ -5,14 +5,37 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 import { loadAgentsConfig } from "@/lib/config/loader";
 import { debateStateManager } from "@/lib/state/debate-state";
 import { debateEventEmitter } from "@/lib/events/emitter";
 import { DebateAgent, createDebateAgents } from "@/lib/agents/debate-agent";
 import { ModeratorAgent } from "@/lib/agents/moderator-agent";
-import type { DebateArgument } from "@/lib/agents/types";
+import { saveDebate } from "@/lib/storage/debate-history";
+import { addMemory } from "@/lib/storage/agent-memory";
+import type { DebateArgument, DebateRound } from "@/lib/agents/types";
 
 export const maxDuration = 300; // 5 minutes max for long debates
+
+/**
+ * Extract a key insight from an argument content
+ */
+function extractKeyInsight(content: string): string | null {
+  if (!content || content.length < 20) return null;
+
+  // Get the first substantive sentence (skip greetings, etc.)
+  const sentences = content
+    .split(/[.!?]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 30);
+
+  if (sentences.length === 0) return null;
+
+  // Return the first substantial sentence, truncated if necessary
+  const insight = sentences[0];
+  return insight.length > 200 ? insight.substring(0, 200) + "..." : insight;
+}
 
 interface StartDebateRequest {
   task: string;
@@ -193,6 +216,63 @@ async function runDebate(
 
   // Complete the debate
   debateStateManager.complete(debateId, summary);
+
+  // Save debate to history
+  try {
+    const rounds: DebateRound[] = [];
+    let currentRound = 1;
+    let currentRoundArgs: DebateArgument[] = [];
+
+    for (const arg of allArguments) {
+      if (arg.round !== currentRound) {
+        rounds.push({
+          number: currentRound,
+          arguments: currentRoundArgs,
+          moderatorSteps: [],
+        });
+        currentRound = arg.round;
+        currentRoundArgs = [arg];
+      } else {
+        currentRoundArgs.push(arg);
+      }
+    }
+
+    // Push the last round
+    if (currentRoundArgs.length > 0) {
+      rounds.push({
+        number: currentRound,
+        arguments: currentRoundArgs,
+        moderatorSteps: [],
+      });
+    }
+
+    await saveDebate({
+      id: debateId,
+      topic: task,
+      agents: agentConfigs.map((a) => ({ id: a.id, name: a.name, color: a.color })),
+      rounds,
+      moderatorSteps: [],
+      summary,
+      createdAt: new Date(parseInt(debateId.split("-")[1])).toISOString(),
+      completedAt: new Date().toISOString(),
+    });
+    console.log(`[Debate ${debateId}] Saved to history`);
+
+    // Save key insights to agent memories
+    for (const arg of allArguments) {
+      // Extract a key insight from arguments (first sentence or key point)
+      const insight = extractKeyInsight(arg.content);
+      if (insight) {
+        await addMemory(arg.agentId, task, insight, {
+          debateId,
+          round: arg.round,
+        }).catch(() => {}); // Silently fail
+      }
+    }
+    console.log(`[Debate ${debateId}] Agent memories updated`);
+  } catch (err) {
+    console.error(`[Debate ${debateId}] Failed to save to history:`, err);
+  }
 
   // Emit completion
   debateEventEmitter.emit(debateId, "debate_complete", {

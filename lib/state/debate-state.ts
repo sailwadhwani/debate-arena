@@ -4,8 +4,22 @@
 
 import type { DebateState, DebateArgument, ModeratorStep, DebateSummary } from "../agents/types";
 
+export interface ViewerReaction {
+  argumentId: string;
+  viewerId: string;
+  type: "agree" | "disagree";
+  timestamp: Date;
+}
+
+export interface DebateViewerState {
+  viewerCount: number;
+  viewers: Set<string>;
+  reactions: Map<string, ViewerReaction[]>; // argumentId -> reactions
+}
+
 class DebateStateManager {
   private states: Map<string, DebateState> = new Map();
+  private viewerStates: Map<string, DebateViewerState> = new Map();
 
   /**
    * Create a new debate
@@ -209,7 +223,149 @@ class DebateStateManager {
   getArgumentsByAgent(debateId: string, agentId: string): DebateArgument[] {
     return this.getAllArguments(debateId).filter((a) => a.agentId === agentId);
   }
+
+  /**
+   * Add a viewer to a debate
+   */
+  addViewer(debateId: string, viewerId: string): number {
+    let viewerState = this.viewerStates.get(debateId);
+    if (!viewerState) {
+      viewerState = {
+        viewerCount: 0,
+        viewers: new Set(),
+        reactions: new Map(),
+      };
+      this.viewerStates.set(debateId, viewerState);
+    }
+
+    if (!viewerState.viewers.has(viewerId)) {
+      viewerState.viewers.add(viewerId);
+      viewerState.viewerCount = viewerState.viewers.size;
+    }
+
+    return viewerState.viewerCount;
+  }
+
+  /**
+   * Remove a viewer from a debate
+   */
+  removeViewer(debateId: string, viewerId: string): number {
+    const viewerState = this.viewerStates.get(debateId);
+    if (!viewerState) return 0;
+
+    viewerState.viewers.delete(viewerId);
+    viewerState.viewerCount = viewerState.viewers.size;
+
+    return viewerState.viewerCount;
+  }
+
+  /**
+   * Get viewer count
+   */
+  getViewerCount(debateId: string): number {
+    return this.viewerStates.get(debateId)?.viewerCount || 0;
+  }
+
+  /**
+   * Add a reaction to an argument
+   */
+  addReaction(debateId: string, argumentId: string, viewerId: string, type: "agree" | "disagree"): ViewerReaction[] {
+    let viewerState = this.viewerStates.get(debateId);
+    if (!viewerState) {
+      viewerState = {
+        viewerCount: 0,
+        viewers: new Set(),
+        reactions: new Map(),
+      };
+      this.viewerStates.set(debateId, viewerState);
+    }
+
+    let reactions = viewerState.reactions.get(argumentId);
+    if (!reactions) {
+      reactions = [];
+      viewerState.reactions.set(argumentId, reactions);
+    }
+
+    // Remove existing reaction from this viewer
+    const existingIndex = reactions.findIndex((r) => r.viewerId === viewerId);
+    if (existingIndex >= 0) {
+      reactions.splice(existingIndex, 1);
+    }
+
+    // Add new reaction
+    reactions.push({
+      argumentId,
+      viewerId,
+      type,
+      timestamp: new Date(),
+    });
+
+    return reactions;
+  }
+
+  /**
+   * Get reactions for an argument
+   */
+  getReactions(debateId: string, argumentId: string): { agree: number; disagree: number } {
+    const viewerState = this.viewerStates.get(debateId);
+    if (!viewerState) return { agree: 0, disagree: 0 };
+
+    const reactions = viewerState.reactions.get(argumentId) || [];
+    return {
+      agree: reactions.filter((r) => r.type === "agree").length,
+      disagree: reactions.filter((r) => r.type === "disagree").length,
+    };
+  }
+
+  /**
+   * Get all reactions for a debate
+   */
+  getAllReactions(debateId: string): Map<string, { agree: number; disagree: number }> {
+    const viewerState = this.viewerStates.get(debateId);
+    if (!viewerState) return new Map();
+
+    const result = new Map<string, { agree: number; disagree: number }>();
+    for (const [argumentId, reactions] of viewerState.reactions) {
+      result.set(argumentId, {
+        agree: reactions.filter((r) => r.type === "agree").length,
+        disagree: reactions.filter((r) => r.type === "disagree").length,
+      });
+    }
+    return result;
+  }
+
+  /**
+   * Generate a shareable link code
+   */
+  generateShareCode(debateId: string): string {
+    const state = this.states.get(debateId);
+    if (!state) return "";
+
+    // Simple encoding - in production, you'd use a proper short link service
+    return Buffer.from(debateId).toString("base64url");
+  }
+
+  /**
+   * Decode a share code
+   */
+  decodeShareCode(code: string): string | null {
+    try {
+      return Buffer.from(code, "base64url").toString();
+    } catch {
+      return null;
+    }
+  }
 }
 
-// Global state manager instance
-export const debateStateManager = new DebateStateManager();
+// Global state manager instance using globalThis to persist across module reloads
+// This is necessary because Next.js may create separate module instances for different API routes
+const globalForDebate = globalThis as unknown as {
+  debateStateManager: DebateStateManager | undefined;
+};
+
+export const debateStateManager =
+  globalForDebate.debateStateManager ?? new DebateStateManager();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForDebate.debateStateManager = debateStateManager;
+}

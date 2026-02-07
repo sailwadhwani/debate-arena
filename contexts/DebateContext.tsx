@@ -3,6 +3,11 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import type { DebateArgument, ModeratorStep, DebateSummary, DebateStatus, DebateRound } from "@/lib/agents/types";
 
+interface CurrentTool {
+  name: string;
+  input?: Record<string, unknown>;
+}
+
 interface DebateState {
   debateId: string | null;
   status: DebateStatus;
@@ -13,6 +18,7 @@ interface DebateState {
   currentRound: number;
   speakingAgent: string | undefined;
   thinkingAgent: string | undefined;
+  currentTool: CurrentTool | undefined;
   moderatorSteps: ModeratorStep[];
   summary: DebateSummary | undefined;
   error: string | undefined;
@@ -30,6 +36,7 @@ interface DebateContextType extends DebateState {
   setCurrentRound: (round: number) => void;
   setSpeakingAgent: (agent: string | undefined) => void;
   setThinkingAgent: (agent: string | undefined) => void;
+  setCurrentTool: (tool: CurrentTool | undefined) => void;
   setModeratorSteps: (steps: ModeratorStep[] | ((prev: ModeratorStep[]) => ModeratorStep[])) => void;
   setSummary: (summary: DebateSummary | undefined) => void;
   setError: (error: string | undefined) => void;
@@ -48,6 +55,7 @@ const initialState: DebateState = {
   currentRound: 0,
   speakingAgent: undefined,
   thinkingAgent: undefined,
+  currentTool: undefined,
   moderatorSteps: [],
   summary: undefined,
   error: undefined,
@@ -99,6 +107,10 @@ export function DebateProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, thinkingAgent }));
   }, []);
 
+  const setCurrentTool = useCallback((currentTool: CurrentTool | undefined) => {
+    setState((prev) => ({ ...prev, currentTool }));
+  }, []);
+
   const setModeratorSteps = useCallback((steps: ModeratorStep[] | ((prev: ModeratorStep[]) => ModeratorStep[])) => {
     setState((prev) => ({
       ...prev,
@@ -145,6 +157,7 @@ export function DebateProvider({ children }: { children: ReactNode }) {
         setCurrentRound,
         setSpeakingAgent,
         setThinkingAgent,
+        setCurrentTool,
         setModeratorSteps,
         setSummary,
         setError,

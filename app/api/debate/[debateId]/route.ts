@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { debateStateManager } from "@/lib/state/debate-state";
 import { debateEventEmitter } from "@/lib/events/emitter";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ debateId: string }> }

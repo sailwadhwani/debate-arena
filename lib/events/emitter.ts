@@ -94,8 +94,17 @@ class DebateEventEmitter {
   }
 }
 
-// Global event emitter instance
-export const debateEventEmitter = new DebateEventEmitter();
+// Global event emitter instance using globalThis to persist across module reloads
+const globalForEvents = globalThis as unknown as {
+  debateEventEmitter: DebateEventEmitter | undefined;
+};
+
+export const debateEventEmitter =
+  globalForEvents.debateEventEmitter ?? new DebateEventEmitter();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForEvents.debateEventEmitter = debateEventEmitter;
+}
 
 /**
  * Helper to create SSE response from event stream

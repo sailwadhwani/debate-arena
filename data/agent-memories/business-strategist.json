@@ -1,0 +1,391 @@
+{
+  "agentId": "business-strategist",
+  "memories": [
+    {
+      "id": "mem-1770007720389-b7zz9pyytsq",
+      "topic": "rice or noodles ",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 1,
+        "timestamp": "2026-02-02T04:48:40.389Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720395-dzhd346u6v7",
+      "topic": "rice or noodles ",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 2,
+        "timestamp": "2026-02-02T04:48:40.395Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720400-zm0uytzaowe",
+      "topic": "rice or noodles ",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 3,
+        "timestamp": "2026-02-02T04:48:40.400Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720404-bn1l1u12pqf",
+      "topic": "rice or noodles ",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 4,
+        "timestamp": "2026-02-02T04:48:40.404Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720408-fb83qixa46u",
+      "topic": "rice or noodles ",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 5,
+        "timestamp": "2026-02-02T04:48:40.408Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007968981-k0v0dirpw7j",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 1,
+        "timestamp": "2026-02-02T04:52:48.981Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007968985-gpdel74yarh",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 2,
+        "timestamp": "2026-02-02T04:52:48.985Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007969000-33o0fx2h57g",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 3,
+        "timestamp": "2026-02-02T04:52:49.000Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007969003-qqt29dlsle",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 4,
+        "timestamp": "2026-02-02T04:52:49.003Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007969005-ahrulsrmc35",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 5,
+        "timestamp": "2026-02-02T04:52:49.005Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530239-08pejbt7w6k6",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 1,
+        "timestamp": "2026-02-02T05:02:10.239Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530244-b42ulx8uau6",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 2,
+        "timestamp": "2026-02-02T05:02:10.244Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530247-a6u2ixqnwhc",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 3,
+        "timestamp": "2026-02-02T05:02:10.247Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530260-1mfgf9pwr8j",
+      "topic": "Rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 4,
+        "timestamp": "2026-02-02T05:02:10.260Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682466-r27n1svclo",
+      "topic": "discuss snow or rain",
+      "insight": "As a politician who never commits, agrees, or defers, I will consider both snow and rain from different perspectives before forming an opinion",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 1,
+        "timestamp": "2026-02-02T05:04:42.466Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682477-oktdhn49iwn",
+      "topic": "discuss snow or rain",
+      "insight": "As a politician who never commits, agrees, or defers, I will consider both snow and rain from different perspectives before forming an opinion",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 2,
+        "timestamp": "2026-02-02T05:04:42.477Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682498-udjn1td05gn",
+      "topic": "discuss snow or rain",
+      "insight": "As a politician who never commits, agrees, or defers, I will consider both snow and rain from different perspectives before forming an opinion",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 3,
+        "timestamp": "2026-02-02T05:04:42.498Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909930-35611p1ia6v",
+      "topic": "discuss snow or rain",
+      "insight": "As a politician who never commits, agrees, or defers, I will consider both snow and rain from different perspectives before forming an opinion",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 1,
+        "timestamp": "2026-02-02T05:08:29.930Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909942-zq9bpz8kji",
+      "topic": "discuss snow or rain",
+      "insight": "As a politician who never commits, agrees, or defers, I will consider both snow and rain from different perspectives before forming an opinion",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 2,
+        "timestamp": "2026-02-02T05:08:29.942Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909943-wqm3ywcdml",
+      "topic": "discuss snow or rain",
+      "insight": "As a politician who never commits, agrees, or defers, I will consider both snow and rain from different perspectives before forming an opinion",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 3,
+        "timestamp": "2026-02-02T05:08:29.943Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909944-bqo8gj43jd",
+      "topic": "discuss snow or rain",
+      "insight": "As a politician who never commits, agrees, or defers, I will consider both snow and rain from different perspectives before forming an opinion",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 4,
+        "timestamp": "2026-02-02T05:08:29.944Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909945-s2wq7a0vk2k",
+      "topic": "discuss snow or rain",
+      "insight": "As a politician who never commits, agrees, or defers, I will consider both snow and rain from different perspectives before forming an opinion",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 5,
+        "timestamp": "2026-02-02T05:08:29.945Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524736-e7thya5c1tm",
+      "topic": "rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 1,
+        "timestamp": "2026-02-02T05:18:44.736Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524750-8d09lb5jnxp",
+      "topic": "rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 2,
+        "timestamp": "2026-02-02T05:18:44.750Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524763-fn7ly1vlemm",
+      "topic": "rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 3,
+        "timestamp": "2026-02-02T05:18:44.763Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524769-qr0ysb40bpc",
+      "topic": "rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 4,
+        "timestamp": "2026-02-02T05:18:44.769Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524775-2cqobh4yl9i",
+      "topic": "rice or noodles\n",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 5,
+        "timestamp": "2026-02-02T05:18:44.775Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541778-hu1mdb8rxq",
+      "topic": "rice or noodles",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 1,
+        "timestamp": "2026-02-02T05:19:01.778Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541781-f07xjnpeeqd",
+      "topic": "rice or noodles",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 2,
+        "timestamp": "2026-02-02T05:19:01.781Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541782-1nglh6o18lj",
+      "topic": "rice or noodles",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 3,
+        "timestamp": "2026-02-02T05:19:01.782Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541783-i3a5gwkqgv",
+      "topic": "rice or noodles",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or noodles should be considered the staple food",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 4,
+        "timestamp": "2026-02-02T05:19:01.783Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770483721672-6hluamarz0e",
+      "topic": "rice or dal",
+      "insight": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or dal should be considered the staple food for several reasons",
+      "source": {
+        "debateId": "debate-1770483685526",
+        "round": 1,
+        "timestamp": "2026-02-07T17:02:01.672Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    }
+  ],
+  "lastUpdated": "2026-02-07T17:02:01.673Z",
+  "totalDebates": 8
+}

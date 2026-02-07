@@ -1,0 +1,77 @@
+{
+  "id": "debate-1770483685526",
+  "topic": "rice or dal",
+  "agents": [
+    {
+      "id": "compliance-counsel",
+      "name": "Dr House",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": "business-strategist",
+      "name": "Politician",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": "product-manager",
+      "name": "Scientist",
+      "color": "#eab308"
+    }
+  ],
+  "rounds": [
+    {
+      "number": 1,
+      "arguments": [
+        {
+          "id": "compliance-counsel-r1-1770483698771",
+          "agentId": "compliance-counsel",
+          "agentName": "Dr House",
+          "agentColor": "#ff6b6b",
+          "round": 1,
+          "content": "I reached the maximum number of reasoning steps. Here is my best assessment based on the information gathered.",
+          "toolsUsed": [
+            "web_search"
+          ],
+          "timestamp": "2026-02-07T17:01:38.771Z"
+        },
+        {
+          "id": "business-strategist-r1-1770483701717",
+          "agentId": "business-strategist",
+          "agentName": "Politician",
+          "agentColor": "#4ecdc4",
+          "round": 1,
+          "content": "As a politician with the attributes you described, I would defer making a definitive stance on whether rice or dal should be considered the staple food for several reasons. Both grains have unique nutritional profiles and cultural significance in different parts of the world. Choosing one over the other could lead to overlooking the benefits each offers. Instead, promoting balanced diets that include both can ensure better health outcomes for populations.",
+          "toolsUsed": [],
+          "timestamp": "2026-02-07T17:01:41.717Z"
+        },
+        {
+          "id": "product-manager-r1-1770483704934",
+          "agentId": "product-manager",
+          "agentName": "Scientist",
+          "agentColor": "#eab308",
+          "round": 1,
+          "content": "As a scientist, recent data from the World Health Organization (WHO) and Food and Agriculture Organization (FAO) indicate that while rice is indeed the staple food for a larger portion of the world's population, particularly in Asia, dal also plays a significant role in nutrition and culture, especially in regions like India. Both grains offer unique nutritional profiles and cultural significance, highlighting the importance of balanced diets that include both.",
+          "toolsUsed": [],
+          "timestamp": "2026-02-07T17:01:44.934Z"
+        }
+      ],
+      "moderatorSteps": []
+    }
+  ],
+  "moderatorSteps": [],
+  "summary": {
+    "consensus": 60,
+    "keyAgreements": [
+      "- Both rice and dal have significant nutritional profiles that contribute to balanced diets.",
+      "There is cultural significance associated with both grains in different parts of the world."
+    ],
+    "keyDisagreements": [
+      "- The role of each grain as a staple food varies between regions (rice in Asia, dal in India).",
+      "Different perspectives suggest promoting balanced diets including both grains versus prioritizing one over the other."
+    ],
+    "recommendation": "Encourage balanced consumption of rice and dal to ensure comprehensive nutritional benefits while respecting cultural significance. This approach acknowledges the unique contributions of each grain without favoring either over the other.",
+    "reasoning": "The consensus level is 60% because there is a significant overlap in views regarding the importance of both grains for balanced diets, but there are also notable differences in their roles as staples and cultural significance. By recommending balanced consumption, we aim to address these differing perspectives while still recognizing the value of both rice and dal."
+  },
+  "createdAt": "2026-02-07T17:01:25.526Z",
+  "completedAt": "2026-02-07T17:02:01.635Z"
+}

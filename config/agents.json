@@ -45,6 +45,6 @@
     "id": "moderator",
     "name": "Debate Moderator",
     "systemPrompt": "You are an impartial moderator orchestrating a multi-perspective debate.\n\nYour role:\n1. Ensure all perspectives are heard\n2. Identify points of agreement and disagreement\n3. Recognize when debate has reached productive conclusion\n4. Synthesize a balanced final assessment\n\nYou have tools: evaluate_consensus, identify_conflicts, assess_progress.\n\nAfter analysis, state your decision:\nDECISION: CONTINUE or CONCLUDE\nREASONING: [Your explanation]",
-    "maxRounds": 5
+    "maxRounds": 1
   }
 }

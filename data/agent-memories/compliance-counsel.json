@@ -1,0 +1,391 @@
+{
+  "agentId": "compliance-counsel",
+  "memories": [
+    {
+      "id": "mem-1770007720376-3cznu0wgqsx",
+      "topic": "rice or noodles ",
+      "insight": "As an AI, I don't have personal perspectives, but based on global consumption patterns, rice is the staple food for a larger portion of the world's population compared to noodles",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 1,
+        "timestamp": "2026-02-02T04:48:40.376Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720391-yryhxdstqzo",
+      "topic": "rice or noodles ",
+      "insight": "As an AI, I can support the previous arguments by providing additional insights from recent data",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 2,
+        "timestamp": "2026-02-02T04:48:40.391Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720399-k3yzbv0o5fj",
+      "topic": "rice or noodles ",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 3,
+        "timestamp": "2026-02-02T04:48:40.399Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720404-byfu0y04gx",
+      "topic": "rice or noodles ",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 4,
+        "timestamp": "2026-02-02T04:48:40.404Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007720407-1gv789ydj43",
+      "topic": "rice or noodles ",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770007609836",
+        "round": 5,
+        "timestamp": "2026-02-02T04:48:40.407Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007968970-h9yea6lc4vh",
+      "topic": "Rice or noodles\n",
+      "insight": "I reached the maximum number of reasoning steps",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 1,
+        "timestamp": "2026-02-02T04:52:48.970Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007968984-tu9pcbal1js",
+      "topic": "Rice or noodles\n",
+      "insight": "As an AI with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns, and nutri...",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 2,
+        "timestamp": "2026-02-02T04:52:48.984Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007968987-ouyuhncbjf",
+      "topic": "Rice or noodles\n",
+      "insight": "As an AI with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns, and nutri...",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 3,
+        "timestamp": "2026-02-02T04:52:48.987Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007969002-8x6919m7mv9",
+      "topic": "Rice or noodles\n",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 4,
+        "timestamp": "2026-02-02T04:52:49.002Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770007969004-ch88fywlzk9",
+      "topic": "Rice or noodles\n",
+      "insight": "As an AI with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns, and nutri...",
+      "source": {
+        "debateId": "debate-1770007852991",
+        "round": 5,
+        "timestamp": "2026-02-02T04:52:49.004Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530221-avqr9m1mdt7",
+      "topic": "Rice or noodles\n",
+      "insight": "I reached the maximum number of reasoning steps",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 1,
+        "timestamp": "2026-02-02T05:02:10.221Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530243-25wo50zasf6",
+      "topic": "Rice or noodles\n",
+      "insight": "As an AI with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns, and nutri...",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 2,
+        "timestamp": "2026-02-02T05:02:10.243Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530246-bw646ahe5d4",
+      "topic": "Rice or noodles\n",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 3,
+        "timestamp": "2026-02-02T05:02:10.246Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008530249-xx5w2skpm1",
+      "topic": "Rice or noodles\n",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770008424517",
+        "round": 4,
+        "timestamp": "2026-02-02T05:02:10.249Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682454-otpo3uj6ry",
+      "topic": "discuss snow or rain",
+      "insight": "From a logical standpoint, both snow and rain are forms of precipitation that occur due to the condensation of water vapor in the atmosphere",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 1,
+        "timestamp": "2026-02-02T05:04:42.454Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682469-a7jt7tp5z1p",
+      "topic": "discuss snow or rain",
+      "insight": "From a logical standpoint, both snow and rain are essential components of our environment",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 2,
+        "timestamp": "2026-02-02T05:04:42.469Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008682498-f3oryjfy3ip",
+      "topic": "discuss snow or rain",
+      "insight": "From an ecological standpoint, both snow and rain are vital for maintaining biodiversity and ecosystem balance",
+      "source": {
+        "debateId": "debate-1770008613017",
+        "round": 3,
+        "timestamp": "2026-02-02T05:04:42.498Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909914-rx7c0ua1ia",
+      "topic": "discuss snow or rain",
+      "insight": "From a logical standpoint, both snow and rain are forms of precipitation that occur due to the condensation of water vapor in the atmosphere",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 1,
+        "timestamp": "2026-02-02T05:08:29.914Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909942-0ebiym1jmq9i",
+      "topic": "discuss snow or rain",
+      "insight": "From a logical standpoint, both snow and rain are forms of precipitation that occur due to the condensation of water vapor in the atmosphere",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 2,
+        "timestamp": "2026-02-02T05:08:29.942Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909943-yrrkwmasel",
+      "topic": "discuss snow or rain",
+      "insight": "From a logical standpoint, both snow and rain are forms of precipitation that occur due to the condensation of water vapor in the atmosphere",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 3,
+        "timestamp": "2026-02-02T05:08:29.943Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909944-n7t31mazfx",
+      "topic": "discuss snow or rain",
+      "insight": "From a logical standpoint, both snow and rain are forms of precipitation that occur due to the condensation of water vapor in the atmosphere",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 4,
+        "timestamp": "2026-02-02T05:08:29.944Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770008909945-7yszoam3pzv",
+      "topic": "discuss snow or rain",
+      "insight": "From a logical standpoint, both snow and rain are forms of precipitation that occur due to the condensation of water vapor in the atmosphere",
+      "source": {
+        "debateId": "debate-1770008796990",
+        "round": 5,
+        "timestamp": "2026-02-02T05:08:29.945Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524693-qnfwp2b7mll",
+      "topic": "rice or noodles\n",
+      "insight": "I reached the maximum number of reasoning steps",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 1,
+        "timestamp": "2026-02-02T05:18:44.693Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524746-t12bvifwmq",
+      "topic": "rice or noodles\n",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 2,
+        "timestamp": "2026-02-02T05:18:44.746Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524758-rdgg4bdp8e",
+      "topic": "rice or noodles\n",
+      "insight": "As an AI with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns, and nutri...",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 3,
+        "timestamp": "2026-02-02T05:18:44.758Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524768-xv2ktd5ypii",
+      "topic": "rice or noodles\n",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 4,
+        "timestamp": "2026-02-02T05:18:44.768Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009524772-5ypik1l8ntg",
+      "topic": "rice or noodles\n",
+      "insight": "As an AI with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns, and nutri...",
+      "source": {
+        "debateId": "debate-1770009324065",
+        "round": 5,
+        "timestamp": "2026-02-02T05:18:44.772Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541747-k0g73d4i0k",
+      "topic": "rice or noodles",
+      "insight": "I reached the maximum number of reasoning steps",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 1,
+        "timestamp": "2026-02-02T05:19:01.747Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541781-bbxg5nf7sbb",
+      "topic": "rice or noodles",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 2,
+        "timestamp": "2026-02-02T05:19:01.781Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541782-errs1joehhr",
+      "topic": "rice or noodles",
+      "insight": "As an AI with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns, and nutri...",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 3,
+        "timestamp": "2026-02-02T05:19:01.782Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770009541783-hvcysaw699r",
+      "topic": "rice or noodles",
+      "insight": "As a logical person with access to information through tools like web_search, I would recommend conducting a comprehensive web search on current global rice and noodle production, consumption patterns...",
+      "source": {
+        "debateId": "debate-1770009341204",
+        "round": 4,
+        "timestamp": "2026-02-02T05:19:01.783Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    },
+    {
+      "id": "mem-1770483721670-ue69mvuosfa",
+      "topic": "rice or dal",
+      "insight": "I reached the maximum number of reasoning steps",
+      "source": {
+        "debateId": "debate-1770483685526",
+        "round": 1,
+        "timestamp": "2026-02-07T17:02:01.670Z"
+      },
+      "confidence": 0.7,
+      "useCount": 0
+    }
+  ],
+  "lastUpdated": "2026-02-07T17:02:01.671Z",
+  "totalDebates": 8
+}
